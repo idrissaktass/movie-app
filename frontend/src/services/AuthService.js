@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/routes';
+const BASE_URL = 'https://movie-app-backend-3jc0kenwt-idris-aktass-projects.vercel.app/routes';
 
 export const loginService = async (email, password) => {
   const response = await fetch(`${BASE_URL}/auth/login`, {
