@@ -9,10 +9,11 @@ dotenv.config();
 
 // Configure CORS with the allowed headers
 app.use(cors({
-  origin: 'http://localhost:3000', // Your frontend URL
+  origin: ['http://localhost:3000', 'https://your-frontend-domain.vercel.app'], // Replace with your actual frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'] // Add 'Authorization' to allowed headers
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 app.use(express.json()); // Move this line above route definitions
 
