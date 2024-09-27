@@ -1,0 +1,117 @@
+/* Movies.css */
+
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    background: url('../../public/main.png') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .hero-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Adjust the rgba values for different color and opacity */
+    z-index: 1;
+  }
+  
+  .hero-text {
+    position: relative;
+    text-align: center;
+    color: white;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.7); /* Optional: darken background for readability */
+    border-radius: 10px;
+    z-index: 2;
+  }
+  
+  .hero-text h2 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+  }
+  
+  .hero-text h6 {
+    font-size: 1.5rem;
+  }
+  
+  .carousel .slide {
+    display: flex;
+    justify-content: center; /* Center the carousel horizontally */
+    align-items: center; /* Center the carousel vertically (if needed) */
+  }
+  
+  .carousel.carousel-slider .control-arrow {
+    align-self: center;
+    margin-right: 20%;
+  }
+  
+  .carousel .carousel-status {
+    margin-right: 20%;
+  }
+
+    @media (max-width: 600px) {
+        .carousel.carousel-slider .control-arrow {
+        margin-right: 0%;
+        }
+    
+        .carousel .carousel-status {
+        margin-right: 0%;
+        }
+    }
+
+    @media (min-width: 600px) {
+        .carousel.carousel-slider .control-arrow {
+        margin-right: 5%;
+        }
+        .carousel .carousel-status {
+            margin-right: 0%;
+            }
+    }
+
+    @media (min-width: 1538px) {
+        .carousel.carousel-slider .control-arrow {
+        margin-right: 10%;
+        }
+    
+        .carousel .carousel-status {
+        margin-right: 10%;
+        }
+    }
+  
+    .carousel .control-next.control-arrow:before{
+        border-left: 14px solid black;
+    }
+
+    .carousel .control-prev.control-arrow:before{
+        border-right: 14px solid black;
+    }
+
+    .carousel .control-prev.control-arrow{
+        align-self: center;
+        margin-left: 20%;
+    }
+
+    @media (max-width: 600px) {
+        .carousel .control-prev.control-arrow {
+        margin-left: 0%;
+        }
+    }
+
+    @media (min-width: 600px) {
+        .carousel .control-prev.control-arrow  {
+        margin-left: 5%;
+        }
+    }
+
+    @media (min-width: 1538px) {
+        .carousel .control-prev.control-arrow  {
+        margin-left: 10%;
+        }
+    }
