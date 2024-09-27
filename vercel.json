@@ -1,0 +1,28 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "/package.json",
+        "use": "@vercel/react"
+      },
+      {
+        "src": "backend/server.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "backend/server.js"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/$1"
+      }
+    ],
+    "env": {
+      "MONGO_URI": "mongodb+srv://idrissaktass98:aktas0998@cluster0.yp4q1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      "JWT_SECRET": "867452886f9520fdb7ba8721bf6d46ebc6b000123fb2bef4cb64d32407d86986"
+    }
+  }
+  
