@@ -6,8 +6,6 @@ const app = express();
 
 dotenv.config();
 
-const cors = require('cors');
-
 // CORS configuration
 app.use(cors({
   origin: [
@@ -39,7 +37,7 @@ app.get('/', (req, res) => {
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect("mongodb+srv://idrissaktass98:aktas0998@cluster0.yp4q1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
