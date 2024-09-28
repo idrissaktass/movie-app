@@ -27,6 +27,7 @@ app.use(express.json()); // Parse JSON request bodies
 const authRoutes = require('./routes/auth');
 const actionsRoute = require('./routes/user-actions');
 app.options('*', cors()); // Preflight handling
+app.use('/manifest.json', express.static('public/manifest.json'));
 
 // Use routes
 app.use('/routes/user-actions', actionsRoute);
