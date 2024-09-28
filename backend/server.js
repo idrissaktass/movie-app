@@ -6,17 +6,21 @@ const app = express();
 
 dotenv.config();
 
-// Configure CORS with allowed origins and headers
+const cors = require('cors');
+
+// CORS configuration
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://movie-app-front-fxj3t8hkz-idris-aktass-projects.vercel.app',
-    'https://movie-app-front-three.vercel.app' // Add more frontend URLs here if needed
+    'https://movie-app-front-three.vercel.app',
+    'https://movie-app-front-fxj3t8hkz-idris-aktass-projects.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, // Allow credentials (e.g., cookies, authorization headers)
 }));
+
+
 
 app.use(express.json()); // Parse JSON request bodies
 
