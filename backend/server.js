@@ -28,8 +28,8 @@ app.options('*', cors()); // Preflight handling
 app.use('/manifest.json', express.static('public/manifest.json'));
 
 // Use routes
-app.use('/routes/user-actions', actionsRoute);
-app.use('/routes/auth', authRoutes);
+app.use('/auth', authRoutes); // Correctly setup routes
+app.use('/user-actions', actionsRoute);
 
 // Root route for testing
 app.get('/', (req, res) => {
