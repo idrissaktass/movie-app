@@ -1,8 +1,8 @@
 //movie-app/frontend/src/services/authservice.js
-const BASE_URL = 'https://movie-app-back.vercel.app'; // Adjusted base URL
+const BASE_URL = 'https://movie-app-api-psi.vercel.app'; // Adjusted base URL
 
 export const loginService = async (email, password) => {
-  const response = await fetch('https://movie-app-back.vercel.app/auth/login', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     mode: 'no-cors',
@@ -24,7 +24,7 @@ export const loginService = async (email, password) => {
 export const signupService = async (username, email, password) => {
   console.log("datasignup")
 
-  const response = await fetch('https://movie-app-back.vercel.app/auth/register', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     mode: 'no-cors',
@@ -51,7 +51,7 @@ export const signupService = async (username, email, password) => {
 
 export const addFavoriteService = async (email, movieId) => {
   console.log("ye",email,movieId)
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/add-favorite', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/add-favorite', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export const addFavoriteService = async (email, movieId) => {
 
 export const addToWatchlistService = async (email, movieId) => {
   console.log("wooww",email,movieId)
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/add-watchlist', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/add-watchlist', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export const addToWatchlistService = async (email, movieId) => {
 };
 
 export const removeFavoriteService = async (email, movieId) => {
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/remove-favorite', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/remove-favorite', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export const removeFavoriteService = async (email, movieId) => {
 };
 
 export const removeFromWatchlistService = async (email, movieId) => {
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/remove-watchlist', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/remove-watchlist', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export const removeFromWatchlistService = async (email, movieId) => {
 };
 
 export const fetchFavoritesService = async (email) => {
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/favorites', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/favorites', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ export const fetchFavoritesService = async (email) => {
 
 export const fetchWatchlistService = async (email) => {
   console.log("121212",email)
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/watchlist', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/watchlist', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ export const fetchWatchlistService = async (email) => {
 // AuthService.js
 
 export const createListService = async (email, listName, isPublic) => {
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/create-list', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/create-list', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -173,7 +173,7 @@ export const createListService = async (email, listName, isPublic) => {
 // AuthService.js
 
 export const getUserListsService = async (email) => {
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/get-lists', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/get-lists', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ export const getUserListsService = async (email) => {
 // AuthService.js
 
 export const addMovieToListService = async (email, listName, movieId) => {
-  const response = await fetch('https://movie-app-back.vercel.app/user-actions/add-to-list', {
+  const response = await fetch('https://movie-app-api-psi.vercel.app/user-actions/add-to-list', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
