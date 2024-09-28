@@ -1,3 +1,4 @@
+//movie-app/backend/routes
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -6,6 +7,7 @@ const authRoutes = express.Router();
 
 authRoutes.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
+  console.log("xd",req.body)
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, email, password: hashedPassword });

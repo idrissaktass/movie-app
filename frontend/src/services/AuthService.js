@@ -1,4 +1,5 @@
-const BASE_URL = 'https://movie-app-back-bkm97t59k-idris-aktass-projects.vercel.app/api';
+//movie-app/frontend/src/services/authservice.js
+const BASE_URL = 'https://movie-app-back-8xm5h6ifn-idris-aktass-projects.vercel.app';
 
 export const loginService = async (email, password) => {
   const response = await fetch(`${BASE_URL}/auth/login`, {
