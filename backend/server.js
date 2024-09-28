@@ -9,7 +9,7 @@ dotenv.config();
 
 // Configure CORS with the allowed headers
 app.use(cors({
-  origin: ['http://localhost:3000','movie-app-walb-3qul7drw9-idris-aktass-projects.vercel.app','https://movie-app-walb.vercel.app' // Add this line],
+  origin: ['http://localhost:3000','https://movie-app-front-fxj3t8hkz-idris-aktass-projects.vercel.app','https://movie-app-front-three.vercel.app' // Add this line],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
