@@ -26,6 +26,7 @@ const authRoutes = require('./routes/auth');
 const actionsRoute = require('./routes/user-actions');
 app.options('*', cors()); // Preflight handling
 app.use('/manifest.json', express.static('public/manifest.json'));
+app.options('/auth/*', cors());
 
 // Use routes
 app.use('/auth', authRoutes); // Correctly setup routes
