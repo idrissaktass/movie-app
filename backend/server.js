@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -7,31 +6,34 @@ const app = express();
 
 dotenv.config();
 
-// Configure CORS with the allowed headers
+// Configure CORS with allowed origins and headers
 app.use(cors({
-  origin: ['http://localhost:3000','https://movie-app-front-fxj3t8hkz-idris-aktass-projects.vercel.app','https://movie-app-front-three.vercel.app' // Add this line],
+  origin: [
+    'http://localhost:3000',
+    'https://movie-app-front-fxj3t8hkz-idris-aktass-projects.vercel.app',
+    'https://movie-app-front-three.vercel.app' // Add more frontend URLs here if needed
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, // Allow credentials (e.g., cookies, authorization headers)
 }));
 
-
-
-app.use(express.json()); // Move this line above route definitions
+app.use(express.json()); // Parse JSON request bodies
 
 const authRoutes = require('./routes/auth');
 const actionsRoute = require('./routes/user-actions');
 
-app.use('/routes/user-actions', actionsRoute); // Corrected route
-
+// Use routes
+app.use('/routes/user-actions', actionsRoute);
 app.use('/routes/auth', authRoutes);
 
-// Add a root route
+// Root route for testing
 app.get('/', (req, res) => {
   res.send('Welcome to the API');
 });
 
 // Connect to MongoDB
-mongoose.connect("mongodb+srv://idrissaktass98:aktas0998@cluster0.yp4q1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
