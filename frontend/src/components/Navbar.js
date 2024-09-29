@@ -64,7 +64,7 @@ const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
   const [showLogin, setShowLogin] = useState(false);
-  const [userName, setUserName] = useState(localStorage.getItem("email") || "email");
+  const [userName, setUserName] = useState(localStorage.getItem("username") || "username");
   const [showWatchlist, setShowWatchlist] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
   const [watchlist, setWatchlist] = useState([]);
@@ -82,7 +82,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("userName");
+    localStorage.removeItem("username");
     localStorage.removeItem("email");
 
     setIsAuthenticated(false);
