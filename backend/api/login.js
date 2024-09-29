@@ -7,16 +7,24 @@ import cors from 'cors';
 
 const app = express();
 
-// Apply CORS globally (you can restrict the origin as needed)
+// CORS middleware
 app.use(cors({
-    origin: 'https://movie-app-frontend-xi.vercel.app',
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+  origin: 'https://movie-app-frontend-xi.vercel.app',
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
 
 // Parse JSON request bodies
 app.use(express.json());
+
+// Handle preflight requests
+app.options('*', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-frontend-xi.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.sendStatus(204); // No content for OPTIONS method
+});
 
 app.post('/login', async (req, res) => {
   // Ensure DB connection

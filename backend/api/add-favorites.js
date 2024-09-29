@@ -1,14 +1,15 @@
 import dbConnect from '../utils/dbConnect'; // Import your MongoDB connection utility
 import User from '../models/User'; // Import the User model
 import Cors from 'cors';
+
 const cors = Cors({
-    origin: 'https://movie-app-frontend-xi.vercel.app',
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
-  
-  
+  origin: 'https://movie-app-frontend-xi.vercel.app',
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+});
+
+// Helper function to run middleware
 const runMiddleware = (req, res, fn) => {
   return new Promise((resolve, reject) => {
     fn(req, res, (result) => {
@@ -23,6 +24,15 @@ const runMiddleware = (req, res, fn) => {
 export default async function handler(req, res) {
   await runMiddleware(req, res, cors); // Run the CORS middleware
   await dbConnect(); // Connect to the database
+
+  // Handle the OPTIONS method (preflight request)
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-frontend-xi.vercel.app');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.status(204).end(); // No content for OPTIONS method
+    return;
+  }
 
   if (req.method === 'POST') {
     const { email, movieId } = req.body;
