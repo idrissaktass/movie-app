@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Box, Typography, Button, CircularProgress, Grid } from "@mui/material";
+import { Modal, Box, Typography, Button, CircularProgress, Grid, Pagination } from "@mui/material";
 import axios from "axios";
 import MovieModal from "./MovieModal";
 
@@ -47,6 +47,15 @@ const FavoritesModal = ({ onClose, favorites, refreshFavorites  }) => {
 
         fetchAllMoviesDetails();
     }, [favorites]);
+    const indexOfLastMovie = currentPage * moviesPerPage;
+    const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+    const currentMovies = moviesDetails.slice(indexOfFirstMovie, indexOfLastMovie);
+    const [currentPage, setCurrentPage] = useState(1);
+    const moviesPerPage = 14;
+
+    const handlePageChange = (event, value) => {
+      setCurrentPage(value);
+    }; 
 
     return (
         <>
@@ -57,7 +66,9 @@ const FavoritesModal = ({ onClose, favorites, refreshFavorites  }) => {
                     boxShadow: 24, 
                     p: 4, 
                     maxWidth: 600, 
-                    margin: 'auto' 
+                    margin: 'auto',
+                    height:"80%",
+                    overflow:"auto" 
                 }}>
                     <Typography variant="h6" component="h2">
                         Your Favorites
@@ -67,7 +78,7 @@ const FavoritesModal = ({ onClose, favorites, refreshFavorites  }) => {
                             <CircularProgress /> // Show a loading spinner while fetching
                         ) : (
                             moviesDetails.length > 0 ? (
-                                moviesDetails.map((movie) => (
+                                currentMovies.map((movie) => (
                                     <Grid display={"flex"} alignItems={"center"} my={0.5} onClick={() => handleOpenModal(movie)}
                                     sx={{ cursor: 'pointer', background: {xs:'linear-gradient(to right, #ff923c42, #ff923c17)'}}}>
                                         <Box height={{xs:"100px", md:"100px"}} width={"20%"} overflow="hidden" display={"flex"} justifyContent={'center'}>
@@ -92,6 +103,14 @@ const FavoritesModal = ({ onClose, favorites, refreshFavorites  }) => {
                                 <Typography variant="body1">No movies in your Favorites.</Typography>
                             )
                         )}
+                    </Box>
+                    <Box display="flex" justifyContent="center" mt={2}>
+                        <Pagination
+                        count={Math.ceil(moviesDetails.length / moviesPerPage)}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        color="primary"
+                        />
                     </Box>
                     <Button onClick={onClose} color="primary">Close</Button>
                 </Box>
