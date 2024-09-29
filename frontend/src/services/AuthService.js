@@ -53,7 +53,7 @@ export const signupService = async (username, email, password) => {
 
 export const addFavoriteService = async (email, movieId) => {
   console.log("ye",email,movieId)
-  const response = await fetch(`${BASE_URL}/add-favorite`, {
+  const response = await fetch(`${BASE_URL}/add-favorites`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
