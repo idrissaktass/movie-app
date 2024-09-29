@@ -47,12 +47,12 @@ const FavoritesModal = ({ onClose, favorites, refreshFavorites  }) => {
 
         fetchAllMoviesDetails();
     }, [favorites]);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const moviesPerPage = 14;
     const indexOfLastMovie = currentPage * moviesPerPage;
     const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
     const currentMovies = moviesDetails.slice(indexOfFirstMovie, indexOfLastMovie);
-    const [currentPage, setCurrentPage] = useState(1);
-    const moviesPerPage = 14;
-
     const handlePageChange = (event, value) => {
       setCurrentPage(value);
     }; 
