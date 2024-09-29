@@ -68,8 +68,8 @@ const FavoritesModal = ({ onClose, favorites, refreshFavorites  }) => {
                     p: 4, 
                     maxWidth: 600, 
                     margin: 'auto',
-                    height:"80%",
-                    overflow:"auto" 
+                    height:"70%",
+                    overflow:"auto", position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
                 }}>
                     <IconButton
                         onClick={handleCloseModal}
