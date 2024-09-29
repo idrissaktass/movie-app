@@ -16,6 +16,7 @@ const Login = ({ setIsAuthenticated }) => {
       const { token, user } = await loginService(email, password);
       localStorage.setItem("token", token); // Store token in localStorage
       localStorage.setItem("email", email);
+      console.log("user",user)
       localStorage.setItem("username", user.username); // Store username in localStorage
       setIsAuthenticated(true); // Update authentication state
       setSnackbarMessage("Login successful!");
