@@ -1,7 +1,7 @@
 //movie-app/frontend/src/services/authservice.js
 const BASE_URL = 'https://movie-app-backend-ruddy.vercel.app/api'; // Adjusted base URL
 
-export const loginService = async (email, password) => {
+export const loginService = async (email, password, username) => {
   const response = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -13,7 +13,10 @@ export const loginService = async (email, password) => {
   console.log("data", data);
   
   if (!response.ok) throw new Error(data.message);
-  
+  localStorage.setItem('token', data.token);
+  localStorage.setItem('email', email); // Save other user info as needed
+  localStorage.setItem('username', username); // Save other user info as needed
+
   return {
     token: data.token,
     user: { id: data.userId, /* other user data */ }
@@ -39,7 +42,8 @@ export const signupService = async (username, email, password) => {
   // Save the token to localStorage or manage it as required
   localStorage.setItem('token', data.token);
   localStorage.setItem('email', email); // Save other user info as needed
-  
+  localStorage.setItem('username', username); // Save other user info as needed
+
   return data.token;
 };
 
