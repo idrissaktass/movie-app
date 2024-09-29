@@ -66,12 +66,12 @@ export default async function handler(req, res) {
       }
 
       // Generate JWT token
-      const token = jwt.sign({ userId: user._id }, '867452886f9520fdb7ba8721bf6d46ebc6b000123fb2bef4cb64d32407d86986', {
+      const token = jwt.sign({ userId: user._id , username: user.username }, '867452886f9520fdb7ba8721bf6d46ebc6b000123fb2bef4cb64d32407d86986', {
         expiresIn: '1h',
       });
 
       // Respond with token and userId
-      res.json({ token, userId: user._id });
+      res.json({ token, userId: user._id, username: user.username });
     } catch (err) {
       console.error('Error during login:', err);
       res.status(500).json({ error: 'Internal Server Error' });
