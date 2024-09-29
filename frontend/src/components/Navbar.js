@@ -171,6 +171,9 @@ const Navbar = () => {
           </Typography>
         </Grid>
         <Box sx={{ display: { xs: "none", md: "flex" }, ml: 2 }}>
+          <Button color="inherit" onClick={handleSearchOptions}>
+            Search Movies
+          </Button>
           <Button color="inherit" onClick={handleWatchlistOpen}>
             Watchlist
           </Button>
@@ -209,6 +212,8 @@ const Navbar = () => {
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
             <MenuItem onClick={handleWatchlistOpen}>Watchlist</MenuItem>
             <MenuItem onClick={handleFavoritesOpen}>Favorites</MenuItem>
+            <MenuItem onClick={handleSearchOptions}>Search Movies</MenuItem>
+
             {isAuthenticated ? (
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             ) : (
