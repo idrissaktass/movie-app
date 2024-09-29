@@ -3,13 +3,12 @@ import User from '../models/User';
 import Cors from 'cors';
 
 const cors = Cors({
-    origin: 'https://movie-app-front-three.vercel.app',
+    origin: 'https://movie-app-frontend-xi.vercel.app/',
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
   
-
 const runMiddleware = (req, res, fn) => {
   return new Promise((resolve, reject) => {
     fn(req, res, (result) => {

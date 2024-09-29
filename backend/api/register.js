@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import Cors from 'cors';
 
 const cors = Cors({
-    origin: 'https://movie-app-front-three.vercel.app',
+    origin: 'https://movie-app-frontend-xi.vercel.app/',
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-front-three.vercel.app');
+        res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-frontend-xi.vercel.app/');
         res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         return res.status(204).end(); // No content
