@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Box, Typography, Button, CircularProgress, Grid } from "@mui/material";
+import { Modal, Box, Typography, Button, CircularProgress, Grid , Pagination} from "@mui/material";
 import axios from "axios";
 import MovieModal from "./MovieModal";
 const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
@@ -7,6 +7,8 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
     const [loadingInfo, setLoadingInfo] = useState(true);   
     const [selectedMovie, setSelectedMovie] = useState(null); // State to hold the selected movie
     const [isMovieModalOpen, setIsMovieModalOpen] = useState(false); // State to control MovieModal visibility
+    const indexOfLastMovie = currentPage * moviesPerPage;
+    const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
 
     const handleOpenModal = (movie) => {
         setSelectedMovie(movie);
@@ -49,7 +51,15 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
 
         fetchAllMoviesDetails();
     }, [watchlist]);
-    console.log("watchlistwatchlist",moviesDetails)
+
+    const currentMovies = moviesDetails.slice(indexOfFirstMovie, indexOfLastMovie);
+    const [currentPage, setCurrentPage] = useState(1);
+    const moviesPerPage = 14;
+
+    const handlePageChange = (event, value) => {
+      setCurrentPage(value);
+    }; 
+
     return (
         <>
             <Modal open={true} onClose={onClose}>
@@ -59,7 +69,9 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
                     boxShadow: 24, 
                     p: 4, 
                     maxWidth: 600, 
-                    margin: 'auto' 
+                    margin: 'auto',
+                    height:"80%",
+                    overflow:"auto"
                 }}>
                     <Typography variant="h6" component="h2">
                         Your Watchlist
@@ -69,7 +81,7 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
                             <CircularProgress /> // Show a loading spinner while fetching
                         ) : (
                             moviesDetails.length > 0 ? (
-                                moviesDetails.map((movie, index) => (
+                                currentMovies.map((movie, index) => (
                                     <>
                                         <Grid display={"flex"} alignItems={"center"} my={0.5} onClick={() => handleOpenModal(movie)}
                                             sx={{ cursor: 'pointer', background: {xs:'linear-gradient(to right, #ff923c42, #ff923c17)'}}}>
@@ -91,6 +103,14 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
                                 <Typography variant="body1">No movies in your watchlist.</Typography>
                             )
                         )}
+                    </Box>
+                    <Box display="flex" justifyContent="center" mt={2}>
+                        <Pagination
+                        count={Math.ceil(moviesDetails.length / moviesPerPage)}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        color="primary"
+                        />
                     </Box>
                     <Button onClick={onClose} color="primary">Close</Button>
                 </Box>
