@@ -1,5 +1,5 @@
-import dbConnect from '../../utils/dbConnect';
-import User from '../../models/User';
+import dbConnect from '../utils/dbConnect';
+import User from '../models/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Cors from 'cors';
