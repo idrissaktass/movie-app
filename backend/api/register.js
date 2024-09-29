@@ -23,7 +23,8 @@ const runMiddleware = (req, res, fn) => {
 };
 
 export default async function handler(req, res) {
-    await runMiddleware(req, res, cors); // Ensure CORS is set up first
+    // Ensure CORS is set up first
+    await runMiddleware(req, res, cors); 
 
     // Handle preflight requests
     if (req.method === 'OPTIONS') {
@@ -34,13 +35,24 @@ export default async function handler(req, res) {
     }
 
     console.log("Start processing request");
-    await dbConnect();
-    console.log("Database connected");
 
+    try {
+        console.log("Connecting to the database...");
+        await dbConnect();
+        console.log("Database connected");
+    } catch (error) {
+        console.error("Database connection error:", error);
+        return res.status(500).json({ error: "Database connection error" });
+    }
 
     if (req.method === 'POST') {
+        console.log("Received request body:", req.body); // Log the entire body
         const { username, email, password } = req.body;
-        console.log("Received data:", { username, email });
+
+        if (!username || !email || !password) {
+            console.error("Missing fields:", { username, email, password });
+            return res.status(400).json({ error: "Missing fields" });
+        }
 
         try {
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -55,7 +67,7 @@ export default async function handler(req, res) {
             res.status(201).json({ message: 'User created successfully', token });
         } catch (err) {
             console.error('Error during registration:', err);
-            res.status(500).json({ error: err.message });
+            res.status(500).json({ error: err.message, stack: err.stack });
         }
     } else {
         res.setHeader('Allow', ['POST']);
