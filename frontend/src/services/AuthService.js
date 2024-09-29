@@ -17,6 +17,7 @@ export const loginService = async (email, password) => {
   // Store token, email, and username in localStorage
   localStorage.setItem('token', data.token);
   localStorage.setItem('email', email);
+  console.log("data",data)
   localStorage.setItem('username', data.username); // Assuming `data.username` contains the username
   
   return {
