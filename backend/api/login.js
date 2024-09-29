@@ -1,65 +1,83 @@
-import express from 'express';
 import dbConnect from '../utils/dbConnect';
 import User from '../models/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import cors from 'cors';
+import Cors from 'cors';
 
-const app = express();
-
-// CORS middleware
-app.use(cors({
+const cors = Cors({
   origin: 'https://movie-app-frontend-xi.vercel.app',
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-}));
-
-// Parse JSON request bodies
-app.use(express.json());
-
-// Handle preflight requests
-app.options('*', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-frontend-xi.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.sendStatus(204); // No content for OPTIONS method
 });
 
-app.post('/login', async (req, res) => {
-  // Ensure DB connection
-  await dbConnect();
-
-  const { email, password } = req.body;
-
-  try {
-    // Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
-
-    // Validate password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, '867452886f9520fdb7ba8721bf6d46ebc6b000123fb2bef4cb64d32407d86986', {
-      expiresIn: '1h',
+// Helper method to run middleware (for CORS)
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
     });
+  });
+}
 
-    // Respond with token and userId
-    res.json({ token, userId: user._id });
-  } catch (err) {
-    console.error('Error during login:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+export default async function handler(req, res) {
+  // Ensure CORS is applied
+  await runMiddleware(req, res, cors);
+
+  // Handle preflight requests for CORS
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-frontend-xi.vercel.app');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(204).end(); // No content for OPTIONS method
   }
-});
 
-// Define your app to listen on a port (3000 or another one)
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  // Ensure DB connection
+  try {
+    console.log("Connecting to the database...");
+    await dbConnect();
+    console.log("Database connected");
+  } catch (error) {
+    console.error("Database connection error:", error);
+    return res.status(500).json({ error: "Database connection error" });
+  }
+
+  if (req.method === 'POST') {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Missing fields' });
+    }
+
+    try {
+      // Check if the user exists
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid email or password' });
+      }
+
+      // Validate the password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid email or password' });
+      }
+
+      // Generate JWT token
+      const token = jwt.sign({ userId: user._id }, '867452886f9520fdb7ba8721bf6d46ebc6b000123fb2bef4cb64d32407d86986', {
+        expiresIn: '1h',
+      });
+
+      // Respond with token and userId
+      res.json({ token, userId: user._id });
+    } catch (err) {
+      console.error('Error during login:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  } else {
+    res.setHeader('Allow', ['POST']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+}
