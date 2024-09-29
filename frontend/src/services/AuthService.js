@@ -5,7 +5,8 @@ export const loginService = async (email, password) => {
   const response = await fetch(`${BASE_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
+    credentials: 'include' // Add this line if necessary
   });
 
   const data = await response.json();
@@ -26,7 +27,9 @@ export const signupService = async (username, email, password) => {
   const response = await fetch(`${BASE_URL}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, email, password })
+    body: JSON.stringify({ username, email, password }),
+    credentials: 'include' // Add this line if necessary
+
   });
 
   const data = await response.json();
@@ -55,7 +58,9 @@ export const addFavoriteService = async (email, movieId) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}` // Keep the token for authentication
     },
-    body: JSON.stringify({ email, movieId }) // Pass the email instead of userId
+    body: JSON.stringify({ email, movieId }), // Pass the email instead of userId
+    credentials: 'include' // Add this line if necessary
+
   });
 
   const data = await response.json();
@@ -71,7 +76,9 @@ export const addToWatchlistService = async (email, movieId) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}` // Keep the token for authentication
     },
-    body: JSON.stringify({ email, movieId }) // Pass the email instead of userId
+    body: JSON.stringify({ email, movieId }), // Pass the email instead of userId
+    credentials: 'include' // Add this line if necessary
+
   });
 
   const data = await response.json();
@@ -87,7 +94,9 @@ export const removeFavoriteService = async (email, movieId) => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
 
-      body: JSON.stringify({ email, movieId })
+      body: JSON.stringify({ email, movieId }),
+      credentials: 'include' // Add this line if necessary
+
   });
   const data = await response.json();
   console.log("qwe",data)
@@ -103,7 +112,9 @@ export const removeFromWatchlistService = async (email, movieId) => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
 
-      body: JSON.stringify({ email, movieId })
+      body: JSON.stringify({ email, movieId }),
+      credentials: 'include' // Add this line if necessary
+
   });
 
   const data = await response.json();
@@ -119,6 +130,8 @@ export const fetchFavoritesService = async (email) => {
       },
 
       body: JSON.stringify({ email }),
+      credentials: 'include' // Add this line if necessary
+
   });
 
   if (!response.ok) {
@@ -138,6 +151,8 @@ export const fetchWatchlistService = async (email) => {
       },
 
       body: JSON.stringify({ email }),
+      credentials: 'include' // Add this line if necessary
+
   });
   console.log("121212",response)
 
@@ -159,7 +174,9 @@ export const createListService = async (email, listName, isPublic) => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
 
-      body: JSON.stringify({ email, listName, isPublic })
+      body: JSON.stringify({ email, listName, isPublic }),
+      credentials: 'include' // Add this line if necessary
+
   });
 
   const data = await response.json();
@@ -176,6 +193,8 @@ export const getUserListsService = async (email) => {
       },
 
       body: JSON.stringify({ email }), // Send email in body
+      credentials: 'include' // Add this line if necessary
+
   });
   
   if (!response.ok) {
@@ -194,6 +213,8 @@ export const addMovieToListService = async (email, listName, movieId) => {
       },
 
       body: JSON.stringify({ email, listName, movieId }), // Adjust the body as needed
+      credentials: 'include' // Add this line if necessary
+
   });
   
   if (!response.ok) {
