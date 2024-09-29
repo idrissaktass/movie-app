@@ -13,9 +13,10 @@ const Login = ({ setIsAuthenticated }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const token = await loginService(email, password);
+      const { token, user } = await loginService(email, password);
       localStorage.setItem("token", token); // Store token in localStorage
       localStorage.setItem("email", email);
+      localStorage.setItem("username", user.username); // Store username in localStorage
       setIsAuthenticated(true); // Update authentication state
       setSnackbarMessage("Login successful!");
       navigate("/"); // Redirect to homepage
@@ -26,6 +27,7 @@ const Login = ({ setIsAuthenticated }) => {
       setOpenSnackbar(true);
     }
   };
+  
 
   return (
     <Grid container justifyContent="center" alignItems="center" sx={{ minHeight: "100vh"}}>
