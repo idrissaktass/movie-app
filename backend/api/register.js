@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       // Generate a token after successful signup
       const token = jwt.sign(
         { userId: newUser._id },
-        process.env.JWT_SECRET || 'your_jwt_secret',
+        "867452886f9520fdb7ba8721bf6d46ebc6b000123fb2bef4cb64d32407d86986",
         { expiresIn: '1h' }
       );
 
