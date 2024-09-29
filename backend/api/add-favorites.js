@@ -1,5 +1,5 @@
-import dbConnect from '../utils/dbConnect'; // Import your MongoDB connection utility
-import User from '../models/User'; // Import the User model
+import dbConnect from '../utils/dbConnect';
+import User from '../models/User';
 import Cors from 'cors';
 
 const cors = Cors({
@@ -22,8 +22,8 @@ const runMiddleware = (req, res, fn) => {
 };
 
 export default async function handler(req, res) {
-  await runMiddleware(req, res, cors); // Run the CORS middleware
-  await dbConnect(); // Connect to the database
+  await runMiddleware(req, res, cors);
+  await dbConnect();
 
   // Handle the OPTIONS method (preflight request)
   if (req.method === 'OPTIONS') {
@@ -34,9 +34,11 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Handle POST requests to add a movie to the favorites
   if (req.method === 'POST') {
-    const { email, movieId } = req.body;
+    const { email, movieId, movieData } = req.body;
 
+    // Validate input data
     if (!email || !movieId) {
       return res.status(400).json({ message: 'Invalid request data' });
     }
@@ -47,10 +49,12 @@ export default async function handler(req, res) {
         return res.status(404).json({ message: 'User not found' });
       }
 
+      // Check if movie is already in the favorites
       if (user.favorites.includes(movieId)) {
         return res.status(400).json({ message: 'Movie already in favorites' });
       }
 
+      // Add movie to favorites
       user.favorites.push(movieId);
       await user.save();
 
@@ -60,7 +64,7 @@ export default async function handler(req, res) {
       res.status(500).json({ message: 'Error adding to favorites' });
     }
   } else {
-    // Handle any other HTTP method
+    // Method not allowed for anything other than POST
     res.setHeader('Allow', ['POST']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
