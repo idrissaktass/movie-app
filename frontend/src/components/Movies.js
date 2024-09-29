@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext  } from 'react';
 import { Grid, Typography, Button, Card, CardContent, CardMedia, useMediaQuery,
-  Modal, Box, CircularProgress, List, ListItem, IconButton, FormGroup, FormControlLabel, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions  } from '@mui/material';
+  Modal, Box, CircularProgress, List, ListItem, IconButton, FormGroup, FormControl, InputLabel, Select, MenuItem,
+  FormControlLabel, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions  } from '@mui/material';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useNavigate } from 'react-router-dom';
@@ -194,6 +195,18 @@ const handleAddToWatchlist = async (movieId) => {
     setSelectedMood(event.target.value);
   };
 
+  const handleMoodChangeMobile = (event) => {
+    const {
+      target: { value },
+    } = event;
+
+    // Convert the value to an array if it is not
+    const valueArray = typeof value === 'string' ? value.split(',') : value;
+
+    // Update selectedMood state
+    setSelectedMood(valueArray);
+  };
+
   const getGenreCombinations = (genreIds) => {
     const combinations = [];
     
@@ -312,30 +325,62 @@ const handleAddToWatchlist = async (movieId) => {
     });
   };
 
+  const handleGenreChangeMobile = (event) => {
+    const {
+      target: { value },
+    } = event;
+  
+    // Convert value to an array if it's not already
+    const valueArray = typeof value === 'string' ? value.split(',') : value;
+  
+    setSelectedGenres((prevSelected) => {
+      const newSelected = valueArray.map((id) => parseInt(id, 10));
+      // Allow updating only if the new selection does not exceed 3 genres
+      if (newSelected.length <= 3) {
+        return newSelected;
+      }
+      return prevSelected; // Do not update if it exceeds 3
+    });
+  };
+  
+
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
   };
 
   useEffect(() => {
     const fetchTopMovies = async () => {
+      const totalPages = 5; // Adjust the number of pages you want to fetch
+      const allMovies = []; // Array to store all movies
+  
       try {
-        const response = await fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&language=en-US&page=1`);
-        const data = await response.json();
-    
-        if (data.results) {
-          // Randomly pick 10 movies for the carousel
-          setTopMovies(data.results.sort(() => 0.5 - Math.random()).slice(0, 12));
-        } else {
-          console.error('Error:', data.status_message);
+        for (let page = 1; page <= totalPages; page++) {
+          const response = await fetch(
+            `https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}&language=en-US&page=${page}`
+          );
+          const data = await response.json();
+          console.log("data",data)
+
+          if (data.results) {
+            allMovies.push(...data.results); // Add the movies from each page
+          } else {
+            console.error('Error:', data.status_message);
+            break; // Exit loop if an error occurs in the API response
+          }
         }
+  
+        // Shuffle the movies and pick 24 randomly for the carousel
+        const randomMovies = allMovies.sort(() => 0.5 - Math.random()).slice(0, 24);
+        setTopMovies(randomMovies);
+  
       } catch (error) {
         console.error('Error fetching top movies:', error);
       }
     };
-
+  
     fetchTopMovies();
-    // fetchMovieData();
   }, [filterText, currentPage, apiKey, moviesPerPage, selectedYear, filter]);
+  
 
   useEffect(() => {
     if (selectedMovie) {
@@ -448,6 +493,23 @@ const handleAddToWatchlist = async (movieId) => {
     setIsMoodMovie(false); // Close the modal
   };
 
+  const moods = [
+    { value: 'happy', label: 'Happy' },
+    { value: 'sad', label: 'Sad' },
+    { value: 'excited', label: 'Excited' },
+    { value: 'relaxed', label: 'Relaxed' },
+    { value: 'adventurous', label: 'Adventurous' },
+    { value: 'scared', label: 'Scared' },
+    { value: 'romantic', label: 'Romantic' },
+    { value: 'romanticcomedy', label: 'Romantic Comedy' },
+    { value: 'thoughtful', label: 'Thoughtful' },
+    { value: 'humorous', label: 'Humorous' },
+    { value: 'uplifting', label: 'Uplifting' },
+    { value: 'tense', label: 'Tense' },
+    { value: 'curious', label: 'Curious' },
+    { value: 'rebellious', label: 'Rebellious' },
+  ];
+
   return (
     <Grid>
       <Navbar/>
@@ -455,10 +517,10 @@ const handleAddToWatchlist = async (movieId) => {
         {/* Hero Section */}
         <Grid container justifyContent="center" alignItems="center" className="hero-section">
           <div className="hero-text">
-            <Typography variant="h2" fontWeight="700">
+            <Typography fontWeight="700" fontSize={{xs:"2.2rem", sm:"2.7rem", md:"3rem"}}>
               Welcome to Movie Explorer
             </Typography>
-            <Typography variant="h6" mt={2}>
+            <Typography fontSize={{xs:"1.1rem", sm:"1.3rem", md:"1.5rem"}} mt={2}>
               Dive into the world of cinema! Discover top-rated movies, get suggestions, and find the perfect film to match your mood. Explore, enjoy, and get lost in the magic of movies.
             </Typography>
           </div>
@@ -467,7 +529,7 @@ const handleAddToWatchlist = async (movieId) => {
         {/* Random Movie Carousel */}
         <Grid container justifyContent="center" alignItems="center">
           {isSmallScreen ? (
-              <Carousel showThumbs={false} autoPlay infiniteLoop >
+              <Carousel showThumbs={false} autoPlay infiniteLoop swipeable={false}>
                 {topMovies.map((movie) => (
                   <Grid xs={10} sm={8} key={movie.id} onClick={() => handleMovieClick(movie)} sx={{cursor:"pointer"}}>
                     <img
@@ -496,7 +558,7 @@ const handleAddToWatchlist = async (movieId) => {
                 ))}
             </Carousel>
           ) : !isBiggerScreen && (
-              <Carousel showThumbs={false} autoPlay infiniteLoop>
+              <Carousel showThumbs={false} autoPlay infiniteLoop swipeable={false}>
               {topMovies.reduce((result, movie, index) => {
                 const chunkIndex = Math.floor(index / 3);
 
@@ -538,7 +600,7 @@ const handleAddToWatchlist = async (movieId) => {
             </Carousel>
           )}
           {isBiggerScreen && (
-            <Carousel showThumbs={false} autoPlay infiniteLoop>
+            <Carousel showThumbs={false} autoPlay infiniteLoop swipeable={false}>
               {topMovies.reduce((result, movie, index) => {
                 const chunkIndex = Math.floor(index / 4);
 
@@ -598,13 +660,12 @@ const handleAddToWatchlist = async (movieId) => {
                 <Typography variant="body2" color="text.secondary" mt={1}>
                   Need a movie recommendation? Whether you're craving action, comedy, or drama, we'll help you find the perfect film to enjoy!"
                 </Typography>
-                <Button onClick={() => setIsRandomMovie(true)} variant="contained" sx={{ mt: 2 }}>Get Random Movie</Button>
+                <Button onClick={() => setIsRandomMovie(true)} variant="contained" fullWidth sx={{ mt: 2, backgroundColor:"#934c14" }}>Get Movie Suggestion</Button>
               </CardContent>
             </Card>
           </Grid>
-
           {/* Card 2 - Movie by Mood */}
-          <Grid item xs={12} md={5} sm={5.8} lg={4}>
+          <Grid item xs={11} md={5} sm={5.8} lg={4}>
         <Card sx={{ boxShadow: "0px 5px 10px #a5792a3d" }}>
           <CardMedia
             component="img"
@@ -619,18 +680,58 @@ const handleAddToWatchlist = async (movieId) => {
             <Typography variant="body2" color="text.secondary" mt={1}>
               Feeling happy, sad, or in need of excitement? Use our "Movie by Mood" feature to find the perfect film for your current mood.
             </Typography>
-            <Button variant="contained" sx={{ mt: 2 }}  onClick={() => setIsMoodMovie(true)}>
+            <Button fullWidth variant="contained" sx={{ mt: 2, backgroundColor:"#934c14" }}  onClick={() => setIsMoodMovie(true)}>
               Find Movie by Mood
             </Button>
           </CardContent>
         </Card>
       </Grid>
         <Modal open={isMoodMovie} onClose={handleCloseMoodModal}>
-        <Grid container height={"90%"} overflow={"scroll"} p={4}
-            sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-            width: {xs:"97%", sm:"90%", md:'80%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
+        <Box height={"80%"} overflow={"auto"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'90%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
+          <IconButton
+            onClick={handleCloseMoodModal}
+            sx={{
+              position: 'sticky',
+              top: 5,           // Stick the button to the top of the scrolling area
+              left: 5,
+              color: 'text.secondary',
+              zIndex: 999,
+              bgcolor: 'white', // Add background color if needed for visibility
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           <Grid display={'flex'} flexDirection={'column'} alignItems={'center'} gap={1}>
             <Typography variant="h6">Select Your Mood</Typography>
+            {isSmallScreen ? (
+                  <FormControl sx={{ mb: 2 , width:"97%"}}>
+                    <InputLabel id="mood-select-label">Select Moods</InputLabel>
+                    <Select
+                      labelId="mood-select-label"
+                      value={selectedMood}
+                      onChange={handleMoodChangeMobile}
+                      renderValue={(selected) => selected.join(', ')} // Display selected moods
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            maxHeight: 300,
+                            "& .MuiMenuItem-root": {
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      {moods.map((mood) => (
+                        <MenuItem key={mood.value} value={mood.value} sx={{display:"flex",justifyContent:"start !important"}}>
+                          <Checkbox checked={selectedMood.indexOf(mood.value) > -1} />
+                          {mood.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+            ) : (
               <Box textAlign={'center'}>
                   <FormControlLabel
                   control={<Checkbox onChange={handleMoodChange} value="happy" />}
@@ -689,8 +790,8 @@ const handleAddToWatchlist = async (movieId) => {
                   label="Rebellious"
                 />
               </Box>
-            
-            <Button sx={{width:"50%"}} variant="contained" onClick={handleSubmit} disabled={!selectedMood}>
+            )}      
+            <Button sx={{width:{xs:"90%", md:"50%"}, backgroundColor:"#934c14"}} variant="contained" onClick={handleSubmit} disabled={!selectedMood}>
               Find Movies
             </Button>
             
@@ -703,24 +804,39 @@ const handleAddToWatchlist = async (movieId) => {
                     const details = moviesDetails?.find(detail => detail.id === movie.id);
                     console.log("details",moviesDetails)
                     return (
-                      <Box key={movie.id} sx={{ mb: 3 }}>
+                      <Box key={movie.id} sx={{ mb: 3 }} pl={{xs:2, sm:3.5}}>
                         <Typography variant="h6">{movie.title}</Typography>
                         <Grid 
                           mb={{ xs: "15px", md: "20px" }} 
                           item 
                           xs={11.5} 
                           pr={{ xs: "10px", md: "20px" }} 
-                          display={'flex'} 
+                          display={'flex'}
+                          flexDirection={{xs:"column", md:"unset"}}
                           gap={2}
                           paddingBlock={{ xs: "10px", md: "unset" }} 
                           paddingLeft={{ xs: "10px", md: "0px" }} 
                           sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)' }}>
-                          <img
-                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                            alt={movie.title}
-                            style={{ width: '20%', height: 'auto' }}
-                          />
-                          
+                            <Grid display={'flex'} justifyContent={'center'}>
+                              <Box 
+                              height={{xs:"50%", sm:"600px", md:"100%"}}
+                              width={{xs:"100%", sm:"70%", md:"250px"}} 
+                              overflow="hidden" 
+                              display={"flex"} 
+                              justifyContent="center"
+                            >
+                              <Box
+                                component="img"
+                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                alt={movie.title}
+                                sx={{ 
+                                  width: '100%',       // Kutunun genişliğine tam sığacak
+                                  height: 'auto',      // Kutunun yüksekliğine tam sığacak
+                                  objectFit: 'cover',  // Resim kutunun içinde tam görünür
+                                }}
+                              />
+                            </Box>
+                            </Grid>
                           <Grid>
                             <Typography variant="body2" mt={2}>
                               {movie.overview}
@@ -754,16 +870,15 @@ const handleAddToWatchlist = async (movieId) => {
                             </Typography>
                             <Grid container mt={1} gap={1} mb={1}>
                             <Button onClick={() => {
-    setSelectedMovie(movie); // Set the selected movie
-    handleAddToFavorites(movie.id); // Pass movie.id to the function
-}}>
-    {favoriteMovies[movie.id] ? (
-        <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
-    ) : (
-        <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
-    )}
-</Button>
-
+                                setSelectedMovie(movie); // Set the selected movie
+                                handleAddToFavorites(movie.id); // Pass movie.id to the function
+                            }}>
+                                {favoriteMovies[movie.id] ? (
+                                    <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
+                                ) : (
+                                    <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
+                                )}
+                            </Button>
                               <Button onClick={() => {
                                   setSelectedMovie(movie); // Set the selected movie
                                   handleAddToWatchlist(movie.id); // Pass movie.id to the function
@@ -797,7 +912,7 @@ const handleAddToWatchlist = async (movieId) => {
                   })}
                 </Box>
               )}
-        </Grid>
+        </Box>
       </Modal>
         </Grid>
       </Grid>
@@ -805,20 +920,22 @@ const handleAddToWatchlist = async (movieId) => {
       {/* Movie Details Modal */}
       {isModalOpen && (
         <Modal open={Boolean(selectedMovie)} onClose={handleCloseModal}>
-        <Box height={"95%"} overflow={"scroll"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'80%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
+        <Box height={"80%"} overflow={"auto"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'80%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
           <IconButton
             onClick={handleCloseModal}
             sx={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              color: 'text.secondary'
+              position: 'sticky',
+              top: 5,           // Stick the button to the top of the scrolling area
+              left: 5,
+              color: 'text.secondary',
+              zIndex: 999,
+              bgcolor: 'white', // Add background color if needed for visibility
             }}
           >
             <CloseIcon />
           </IconButton>
           {selectedMovie && (
-            <Grid container paddingInline={{xs:"10px", lg:"40px"}} paddingBlock={{xs:"20px", lg:"40px"}} justifyContent={'center'}>
+            <Grid container paddingInline={{xs:"10px", lg:"40px"}} paddingBlock={{xs:"10px", sm:"20px", lg:"40px"}} justifyContent={'center'}>
               {/* Movie details section */}
               <Grid xs={12} textAlign={"center"} mb={2}>
                 <Typography variant="h5" component="h2">
@@ -826,7 +943,7 @@ const handleAddToWatchlist = async (movieId) => {
                 </Typography>
               </Grid>
               <Grid mb={{xs:"0px", md:"20px"}} item xs={11.5} md={6} textAlign={"center"} sx={{ background: {xs:'linear-gradient(to right, #ff923c12, #ff923c42)', md:'linear-gradient(to right, transparent, #ff923c12)'}}}>
-                <Box height={{xs:"500px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'}>
+                <Box height={{xs:"475px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'}>
                   <Box
                     component="img"
                     src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
@@ -972,33 +1089,75 @@ const handleAddToWatchlist = async (movieId) => {
       </Modal>
       )}
         <Modal open={Boolean(isRandomMovie)} onClose={handleCloseRandomModal}>
-          <Box height={"90%"} overflow={"scroll"} p={4}
-          sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          width: {xs:"97%", sm:"90%", md:'80%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
+          <Box height={"80%"} overflow={"auto"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'90%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
+          <IconButton
+            onClick={handleCloseRandomModal}
+            sx={{
+              position: 'sticky',
+              top: 5,           // Stick the button to the top of the scrolling area
+              left: 5,
+              color: 'text.secondary',
+              zIndex: 999,
+              bgcolor: 'white', // Add background color if needed for visibility
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
             <Typography variant="h6" gutterBottom>
               Pick Genres (Select up to 3)
             </Typography>  
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent:"center" }}>
-              {genresList.map((genre) => (
-                <FormControlLabel
-                  key={genre.id}
-                  control={
-                    <Checkbox
-                      value={genre.id}
-                      checked={selectedGenres.includes(genre.id)}
-                      onChange={handleGenreChange}
-                      disabled={
-                        selectedGenres.length === 3 && !selectedGenres.includes(genre.id)
-                      }
-                    />
-                  }
-                  label={genre.name}
+            <Grid display={'flex'} flexDirection={'column'} alignItems={'center'} gap={1}>
+      {isSmallScreen ? (
+        <FormControl sx={{ mb: 2, width:"98%" }}>
+          <InputLabel id="genre-select-label">Select Genres</InputLabel>
+          <Select
+            labelId="genre-select-label"
+            multiple
+            value={selectedGenres}
+            onChange={handleGenreChangeMobile}
+            renderValue={(selected) => selected.join(', ')} // Display selected genres
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  maxHeight: 300,
+                  "& .MuiMenuItem-root": {
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  },
+                },
+              },
+            }}
+          >
+            {genresList.map((genre) => (
+              <MenuItem key={genre.id} value={genre.id} sx={{display:"flex",justifyContent:"start !important"}}>
+                <Checkbox checked={selectedGenres.includes(genre.id)} />
+                {genre.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ) : (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: "center" }}>
+          {genresList.map((genre) => (
+            <FormControlLabel
+              key={genre.id}
+              control={
+                <Checkbox
+                  value={genre.id}
+                  checked={selectedGenres.includes(genre.id)}
+                  onChange={handleGenreChange}
+                  disabled={selectedGenres.length === 3 && !selectedGenres.includes(genre.id)}
                 />
-              ))}
-            </Box>
-            <Button variant="contained" onClick={fetchRandomMovie} sx={{ mt: 2 }}>
-              Find a Movie
-            </Button>
+              }
+              label={genre.name}
+            />
+          ))}
+        </Box>
+      )}
+      <Button variant="contained" onClick={fetchRandomMovie} sx={{ mt: 2 }}>
+        Find a Movie
+      </Button>
+    </Grid>
             {loading && <CircularProgress sx={{ mt: 2 }} />}
             {movies?.length > 0 && (
               <Box sx={{ mt: 2 }}>
@@ -1016,17 +1175,31 @@ const handleAddToWatchlist = async (movieId) => {
                         md={6} 
                         pr={{ xs: "10px", md: "20px" }} 
                         display={'flex'} 
+                        flexDirection={{xs:"column", md:"unset"}}
                         gap={2}
                         paddingBlock={{ xs: "10px", md: "unset" }} 
                         paddingLeft={{ xs: "10px", md: "0px" }} 
                         sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)' }}>
-                        
-                        <img
-                          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                          alt={movie.title}
-                          style={{ width: '20%', height: 'auto', marginTop: '10px' }}
-                        />
-                        
+                            <Grid display={'flex'} justifyContent={'center'}>
+                              <Box 
+                              height={{xs:"50%", sm:"600px", md:"100%"}}
+                              width={{xs:"100%", sm:"70%", md:"250px"}} 
+                              overflow="hidden" 
+                              display={"flex"} 
+                              justifyContent="center"
+                            >
+                              <Box
+                                component="img"
+                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                alt={movie.title}
+                                sx={{ 
+                                  width: '100%',       // Kutunun genişliğine tam sığacak
+                                  height: 'auto',      // Kutunun yüksekliğine tam sığacak
+                                  objectFit: 'cover',  // Resim kutunun içinde tam görünür
+                                }}
+                              />
+                            </Box>
+                            </Grid>
                         <Grid>
                           <Typography variant="body2" mt={2}>
                             {movie.overview}
@@ -1079,21 +1252,21 @@ const handleAddToWatchlist = async (movieId) => {
                                     <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
                                   )}                  
                               </Button>
-        <div>
-            <Button onClick={handleAddToListClick}>
-                Add to a List
-            </Button>
+                            <div>
+                                <Button onClick={handleAddToListClick}>
+                                    Add to a List
+                                </Button>
 
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Create a New List</DialogTitle>
-                <DialogContent>
-                    <CreateList selectedMovie={selectedMovie} onClose={handleClose} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                </DialogActions>
-            </Dialog>
-        </div>
+                                <Dialog open={open} onClose={handleClose}>
+                                    <DialogTitle>Create a New List</DialogTitle>
+                                    <DialogContent>
+                                        <CreateList selectedMovie={selectedMovie} onClose={handleClose} />
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button onClick={handleClose}>Cancel</Button>
+                                    </DialogActions>
+                                </Dialog>
+                            </div>
                           </Grid>
                         </Grid>
                       </Grid>
