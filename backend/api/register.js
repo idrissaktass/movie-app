@@ -33,10 +33,14 @@ export default async function handler(req, res) {
         return res.status(204).end(); // No content
     }
 
+    console.log("Start processing request");
     await dbConnect();
+    console.log("Database connected");
+
 
     if (req.method === 'POST') {
         const { username, email, password } = req.body;
+        console.log("Received data:", { username, email });
 
         try {
             const hashedPassword = await bcrypt.hash(password, 10);
