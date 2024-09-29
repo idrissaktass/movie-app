@@ -55,10 +55,13 @@ const SearchResults = ({ onClose, SearchResults  }) => {
     setIsMovieModalOpen(true); // Open the MovieModal
     console.log("movie",movie)
   };
-
+  const refreshSearch = async () => {
+    fetchMovies()
+  };
   const handleCloseModal = () => {
     setIsMovieModalOpen(false);
     setSelectedMovie(null); // Clear the selected movie
+    refreshSearch()
   };
 
   useEffect(() => {
