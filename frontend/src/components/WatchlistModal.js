@@ -7,8 +7,7 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
     const [loadingInfo, setLoadingInfo] = useState(true);   
     const [selectedMovie, setSelectedMovie] = useState(null); // State to hold the selected movie
     const [isMovieModalOpen, setIsMovieModalOpen] = useState(false); // State to control MovieModal visibility
-    const indexOfLastMovie = currentPage * moviesPerPage;
-    const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+    const [currentPage, setCurrentPage] = useState(1);
 
     const handleOpenModal = (movie) => {
         setSelectedMovie(movie);
@@ -52,13 +51,15 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
         fetchAllMoviesDetails();
     }, [watchlist]);
 
-    const currentMovies = moviesDetails.slice(indexOfFirstMovie, indexOfLastMovie);
-    const [currentPage, setCurrentPage] = useState(1);
-    const moviesPerPage = 14;
 
     const handlePageChange = (event, value) => {
       setCurrentPage(value);
     }; 
+    const moviesPerPage = 14;
+    const indexOfLastMovie = currentPage * moviesPerPage;
+    const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+    const currentMovies = moviesDetails.slice(indexOfFirstMovie, indexOfLastMovie);
+
 
     return (
         <>
