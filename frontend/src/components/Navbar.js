@@ -160,14 +160,16 @@ const Navbar = () => {
     <AppBar position="static" sx={{ backgroundColor: "#934c14" }}>
       <Toolbar>
         <Grid flexGrow={1}>
-          <Typography variant="h6" noWrap width={"fit-content"} sx={{ cursor:"pointer" }} onClick={() => navigate("/")}>
+          <Typography
+            variant="h6"
+            noWrap
+            width={"fit-content"}
+            sx={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
             MovieHub
           </Typography>
         </Grid>
-        <Button color="inherit" onClick={handleSearchOptions}>
-          Search Movies
-        </Button>
-
         <Box sx={{ display: { xs: "none", md: "flex" }, ml: 2 }}>
           <Button color="inherit" onClick={handleWatchlistOpen}>
             Watchlist
@@ -194,8 +196,30 @@ const Navbar = () => {
           )}
         </Box>
 
-        {showWatchlist && <WatchlistModal onClose={() => setShowWatchlist(false)} watchlist={watchlist} refreshWatchlist={refreshWatchlist}/>}
-        {showFavorites && <FavoritesModal onClose={() => setShowFavorites(false)} favorites={favorites} refreshFavorites={refreshFavorites}/>}
+        {/* Hamburger Menu for Mobile */}
+        <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+          <IconButton
+            edge="end"
+            color="inherit"
+            aria-label="menu"
+            onClick={handleMenuOpen}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+            <MenuItem onClick={handleWatchlistOpen}>Watchlist</MenuItem>
+            <MenuItem onClick={handleFavoritesOpen}>Favorites</MenuItem>
+            {isAuthenticated ? (
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            ) : (
+              <MenuItem onClick={() => navigate("/login")}>Login</MenuItem>
+            )}
+          </Menu>
+        </Box>
+
+        {/* Modals for Watchlist and Favorites */}
+        {showWatchlist && <WatchlistModal onClose={() => setShowWatchlist(false)} watchlist={watchlist} />}
+        {showFavorites && <FavoritesModal onClose={() => setShowFavorites(false)} favorites={favorites} />}
       </Toolbar>
     </AppBar>
   );
