@@ -3,7 +3,7 @@ import User from '../models/User';
 import Cors from 'cors';
 
 const cors = Cors({
-  origin: 'https://movie-app-front-three.vercel.app',
+  origin: 'https://movie-app-frontend-xi.vercel.app',
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
   // Handle the OPTIONS method (preflight request)
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-front-three.vercel.app');
+    res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-frontend-xi.vercel.app');
     res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.status(204).end(); // No content for OPTIONS method
