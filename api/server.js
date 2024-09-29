@@ -25,7 +25,7 @@ app.use(cors({
 }));
 
 app.use(express.json()); // Parse JSON request bodies
-
+app.use(express.static('public')); 
 // User actions routes
 app.post('/user-actions/add-favorite', async (req, res) => {
   console.log('Request body:', req.body); // Log request body

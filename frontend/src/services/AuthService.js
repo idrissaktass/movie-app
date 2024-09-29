@@ -5,7 +5,6 @@ export const loginService = async (email, password) => {
   const response = await fetch('https://movie-app-api-psi.vercel.app/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    mode: 'no-cors',
     body: JSON.stringify({ email, password })
   });
 
@@ -27,7 +26,6 @@ export const signupService = async (username, email, password) => {
   const response = await fetch('https://movie-app-api-psi.vercel.app/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    mode: 'no-cors',
     body: JSON.stringify({ username, email, password })
   });
 
@@ -57,7 +55,6 @@ export const addFavoriteService = async (email, movieId) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}` // Keep the token for authentication
     },
-    mode: 'no-cors',
     body: JSON.stringify({ email, movieId }) // Pass the email instead of userId
   });
 
@@ -74,7 +71,6 @@ export const addToWatchlistService = async (email, movieId) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}` // Keep the token for authentication
     },
-    mode: 'no-cors',
     body: JSON.stringify({ email, movieId }) // Pass the email instead of userId
   });
 
@@ -90,7 +86,7 @@ export const removeFavoriteService = async (email, movieId) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
-      mode: 'no-cors',
+
       body: JSON.stringify({ email, movieId })
   });
   const data = await response.json();
@@ -106,7 +102,7 @@ export const removeFromWatchlistService = async (email, movieId) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
-      mode: 'no-cors',
+
       body: JSON.stringify({ email, movieId })
   });
 
@@ -121,7 +117,7 @@ export const fetchFavoritesService = async (email) => {
       headers: {
           'Content-Type': 'application/json',
       },
-      mode: 'no-cors',
+
       body: JSON.stringify({ email }),
   });
 
@@ -140,7 +136,7 @@ export const fetchWatchlistService = async (email) => {
       headers: {
           'Content-Type': 'application/json',
       },
-      mode: 'no-cors',
+
       body: JSON.stringify({ email }),
   });
   console.log("121212",response)
@@ -162,7 +158,7 @@ export const createListService = async (email, listName, isPublic) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
-      mode: 'no-cors',
+
       body: JSON.stringify({ email, listName, isPublic })
   });
 
@@ -178,7 +174,7 @@ export const getUserListsService = async (email) => {
       headers: {
           'Content-Type': 'application/json',
       },
-      mode: 'no-cors',
+
       body: JSON.stringify({ email }), // Send email in body
   });
   
@@ -196,7 +192,7 @@ export const addMovieToListService = async (email, listName, movieId) => {
       headers: {
           'Content-Type': 'application/json',
       },
-      mode: 'no-cors',
+
       body: JSON.stringify({ email, listName, movieId }), // Adjust the body as needed
   });
   
