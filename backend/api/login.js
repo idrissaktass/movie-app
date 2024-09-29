@@ -1,57 +1,57 @@
+import express from 'express';
 import dbConnect from '../utils/dbConnect';
 import User from '../models/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import Cors from 'cors';
+import cors from 'cors';
 
-const cors = Cors({
-    origin: 'https://movie-app-frontend-xi.vercel.app/',
+const app = express();
+
+// Apply CORS globally (you can restrict the origin as needed)
+app.use(cors({
+    origin: 'https://movie-app-frontend-xi.vercel.app',
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  });
-  
+    credentials: true
+}));
 
-const runMiddleware = (req, res, fn) => {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-};
+// Parse JSON request bodies
+app.use(express.json());
 
-export default async function handler(req, res) {
-  await runMiddleware(req, res, cors);
+app.post('/login', async (req, res) => {
+  // Ensure DB connection
   await dbConnect();
 
-  if (req.method === 'POST') {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    try {
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ message: 'Invalid email or password' });
-      }
-
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid email or password' });
-      }
-
-      const token = jwt.sign({ userId: user._id }, "867452886f9520fdb7ba8721bf6d46ebc6b000123fb2bef4cb64d32407d86986", {
-        expiresIn: '1h',
-      });
-
-      res.json({ token, userId: user._id }); // Return user ID with the token
-    } catch (err) {
-      console.error('Error during login:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
+  try {
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid email or password' });
     }
-  } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+
+    // Validate password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, '867452886f9520fdb7ba8721bf6d46ebc6b000123fb2bef4cb64d32407d86986', {
+      expiresIn: '1h',
+    });
+
+    // Respond with token and userId
+    res.json({ token, userId: user._id });
+  } catch (err) {
+    console.error('Error during login:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-}
+});
+
+// Define your app to listen on a port (3000 or another one)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
