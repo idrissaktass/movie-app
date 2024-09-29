@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Box, Typography, Button, CircularProgress, Grid , Pagination} from "@mui/material";
+import { Modal, Box, Typography, Button, CircularProgress, Grid , Pagination, IconButton} from "@mui/material";
 import axios from "axios";
 import MovieModal from "./MovieModal";
+import CloseIcon from '@mui/icons-material/Close'; // Import the Close icon
+
 const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
     const [moviesDetails, setMoviesDetails] = useState([]);
     const [loadingInfo, setLoadingInfo] = useState(true);   
@@ -74,6 +76,19 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
                     height:"80%",
                     overflow:"auto"
                 }}>
+                    <IconButton
+                        onClick={handleCloseModal}
+                        sx={{
+                        position: 'sticky',
+                        top: 5,           // Stick the button to the top of the scrolling area
+                        left: 5,
+                        color: 'text.secondary',
+                        zIndex: 999,
+                        bgcolor: 'white', // Add background color if needed for visibility
+                        }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
                     <Typography variant="h6" component="h2">
                         Your Watchlist
                     </Typography>
@@ -86,17 +101,16 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
                                     <>
                                         <Grid display={"flex"} alignItems={"center"} my={0.5} onClick={() => handleOpenModal(movie)}
                                             sx={{ cursor: 'pointer', background: {xs:'linear-gradient(to right, #ff923c42, #ff923c17)'}}}>
-                                                <Box height={{xs:"100px", md:"100px"}} width={"20%"} overflow="hidden" display={"flex"} justifyContent={'center'}>
-                                                    <Box
-                                                    component="img"
-                                                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                                                    alt={movie.title}
-                                                    sx={{width: {xs:"100%", md:"85%", lg:"80%", xl:"70%"}, position: 'relative', alignSelf:"center" }}
-                                                    />
-                                                </Box>
-                                                <Typography key={index} variant="body1">
-                                                    {`${movie.title} (${movie.release_date.split('-')[0]})`} {/* Display movie title and release year */}
-                                                </Typography>
+                                            <Grid item xs={5.5} sm={3.5} key={movie.id}>
+                                                <Box
+                                                component="img"
+                                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                                alt={movie.title}
+                                                onClick={() => handleOpenModal(movie)}
+                                                sx={{width: {xs:"100%"},cursor: 'pointer', position: 'relative', alignSelf:"center" }}
+                                                />                
+                                                <Typography>{`${movie.title} (${movie.release_date.split('-')[0]})`}</Typography>
+                                            </Grid>
                                             </Grid>
                                     </>
                                 ))
