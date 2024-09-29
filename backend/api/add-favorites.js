@@ -1,11 +1,25 @@
-import dbConnect from '../../utils/dbConnect'; // Import your MongoDB connection utility
-import User from '../../models/User'; // Import the User model
+import dbConnect from '../utils/dbConnect'; // Import your MongoDB connection utility
+import User from '../models/User'; // Import the User model
 import Cors from 'cors';
 
-const cors = Cors({
-  methods: ['GET', 'POST', 'OPTIONS'],
-});
-
+const allowedOrigins = [
+    'https://movie-app-front-three.vercel.app', // Production URL
+    'http://localhost:5000', // Local development URL
+  ];
+  
+  const cors = Cors({
+    origin: (origin, callback) => {
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true,
+  });
+  
+  
 const runMiddleware = (req, res, fn) => {
   return new Promise((resolve, reject) => {
     fn(req, res, (result) => {

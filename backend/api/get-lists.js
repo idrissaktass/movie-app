@@ -2,8 +2,21 @@ import dbConnect from '../utils/dbConnect';
 import User from '../models/User';
 import Cors from 'cors';
 
+const allowedOrigins = [
+  'https://movie-app-front-three.vercel.app', // Production URL
+  'http://localhost:5000', // Local development URL
+];
+
 const cors = Cors({
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'OPTIONS'],
+  credentials: true,
 });
 
 const runMiddleware = (req, res, fn) => {
