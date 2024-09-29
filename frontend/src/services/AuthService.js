@@ -22,25 +22,26 @@ export const loginService = async (email, password) => {
 
 
 export const signupService = async (username, email, password) => {
-  console.log("datasignup")
+  console.log("datasignup");
 
   const response = await fetch(`${BASE_URL}/register`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({ username, email, password }),
-    credentials: 'include' // Add this line if necessary
-
+    mode: 'no-cors', // Change here to no-cors
+    credentials: 'include' // This line is not applicable in no-cors mode
   });
 
-  const data = await response.json();
-  console.log("datasignup",data)
-  if (!response.ok) throw new Error(data.message);
+  // Since the response won't be accessible in no-cors mode, you can't read data from it.
+  // You can only check if the request was made successfully or not.
+  if (!response.ok) {
+    throw new Error("Request failed: Unable to get a valid response");
+  }
 
-  // Save the token to localStorage or manage it as required
-  localStorage.setItem('token', data.token);
-  localStorage.setItem('email', email); // Save other user info as needed
-  
-  return data.token;
+  console.log("Signup request sent successfully, but no response data available.");
+  return; // You won't have access to any token or data
 };
 
 
