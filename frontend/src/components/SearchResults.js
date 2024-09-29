@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-
-const SearchResults = () => {
+import MovieModal from './MovieModal';
+const SearchResults = ({ onClose, SearchResults  }) => {
   const [genres, setGenres] = useState([]);
   const [releaseYears, setReleaseYears] = useState([]);
   const navigate = useNavigate();
@@ -26,6 +26,10 @@ const SearchResults = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Set to current year
   const [yearIsClicked, setYearIsClicked] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [moviesDetails, setMoviesDetails] = useState([]);
+  const [loadingInfo, setLoadingInfo] = useState(true);
+  const [selectedMovie, setSelectedMovie] = useState(null); // State to hold the selected movie
+  const [isMovieModalOpen, setIsMovieModalOpen] = useState(false); // State to control MovieModal visibility
 
   // Determine how many page numbers to display
   const visiblePageCount = isMd ? 5 : isXs ? 3 : 10;
@@ -44,6 +48,17 @@ const SearchResults = () => {
       }
       return prevChunk;
     });
+  };
+
+  const handleOpenModal = (movie) => {
+    setSelectedMovie(movie);
+    setIsMovieModalOpen(true); // Open the MovieModal
+    console.log("movie",movie)
+  };
+
+  const handleCloseModal = () => {
+    setIsMovieModalOpen(false);
+    setSelectedMovie(null); // Clear the selected movie
   };
 
   useEffect(() => {
@@ -203,6 +218,7 @@ const SearchResults = () => {
                 <Grid item xs={5} sm={2.8} md={2} lg={2} key={movie.id}>
                   <Box position="relative">
                     <img
+                      onClick={() => handleOpenModal(movie)}
                       src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                       alt={movie.title}
                       style={{ width: '100%', height: 'auto' }}
@@ -267,6 +283,9 @@ const SearchResults = () => {
           </Grid>
         )}
       </Grid>
+      {isMovieModalOpen && ( // Render MovieModal if it's open
+        <MovieModal selectedMovie={selectedMovie} onClose={handleCloseModal} onOpen={handleOpenModal}/>
+      )}
     </Grid>
   );
 };
