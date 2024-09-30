@@ -724,7 +724,7 @@ const handleAddToWatchlist = async (movieId) => {
           )}
         </Grid>
         {/* Explanation Cards */}
-        <Grid container justifyContent="center" spacing={4} mt={5}>
+        <Grid container justifyContent="center" spacing={4} mt={{xs:0, md:2}}>
           {/* Card 1 - Random Movie Suggestions */}
           <Grid item xs={11} sm={5.8} md={5} lg={4}>
             <Card sx={{boxShadow:"0px 5px 10px #a5792a3d"}}>
