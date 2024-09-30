@@ -95,16 +95,21 @@ const SearchResults = ({ onClose, SearchResults  }) => {
   }, []);
 
   const handleGenreClick = async (genre) => {
-    const isAlreadySelected = selectedGenres.includes(genre.id);
-    const updatedGenres = isAlreadySelected 
-      ? selectedGenres.filter((id) => id !== genre.id) // Deselect if already selected
-      : [...selectedGenres, genre.id]; // Select the genre
-
-    setSelectedGenres(updatedGenres); // Update state
+    // If the clicked genre is already selected, deselect it by setting selectedGenres to an empty array
+    const isGenreSelected = selectedGenres.includes(genre.id);
+    
+    // If it's selected, we clear the selection, otherwise, we select the clicked genre
+    const updatedGenres = isGenreSelected ? [] : [genre.id];
+    
+    setSelectedGenres(updatedGenres); // Update state with only the selected genre
     setCurrentPage(1); // Reset to the first page
-    fetchMovies(updatedGenres, selectedYear, 1); // Fetch movies based on selected genres
+  
+    // Fetch movies based on the selected genre or no genre (if deselected)
+    fetchMovies(updatedGenres, selectedYear, 1);
   };
-
+  
+  
+  
   const handlePageChange = async (page) => {
     setCurrentPage(page);
     fetchMovies(selectedGenres, selectedYear, page); // Fetch movies based on selected genres
