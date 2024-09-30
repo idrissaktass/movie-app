@@ -1076,7 +1076,7 @@ const handleAddToWatchlist = async (movieId) => {
                       <FavoriteBorderOutlinedIcon style={{ color:'red', fontSize:"36px" }} />
                     )}
                   </Button>
-                  <Button onClick={handleAddToWatchlist}>
+                  <Button onClick={() => {handleAddToWatchlist(selectedMovie.id);}}>
                     {isInWatchlist ? (
                         <WatchLaterIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
                       ) : (
