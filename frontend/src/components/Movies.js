@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext  } from 'react';
 import { Grid, Typography, Button, Card, CardContent, CardMedia, useMediaQuery,
   Modal, Box, CircularProgress, List, ListItem, IconButton, FormGroup, FormControl, InputLabel, Select, MenuItem,
-  FormControlLabel, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions  } from '@mui/material';
+  FormControlLabel, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert  } from '@mui/material';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useNavigate } from 'react-router-dom';
@@ -101,14 +101,26 @@ function Movies() {
   const [open, setOpen] = useState(false);
   const [favoriteMovies, setFavoriteMovies] = useState({}); // To track favorites for each movie
   const [watchlistMovies, setWatchlistMovies] = useState({}); // To track favorites for each movie
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
+  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+  const [selectedGenreNames, setSelectedGenreNames] = useState([]);
 
   const handleAddToListClick = () => {
     setOpen(true); // Open the dialog
-};
+  };
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+        return;
+    }
+    setSnackbarOpen(false);
+  };
 
-const handleClose = () => {
-    setOpen(false); // Close the dialog
-};
+  const handleClose = () => {
+      setOpen(false); // Close the dialog
+  };
 
   useEffect(() => {
     const email = localStorage.getItem("email");
@@ -138,57 +150,71 @@ const handleClose = () => {
 }, [selectedMovie]); // Run effect whenever selectedMovie changes
 
 
-const handleAddToFavorites = async (movieId) => { // Accept movieId as an argument
+const handleAddToFavorites = async (movieId) => {
   const email = localStorage.getItem("email");
   if (email) {
+    setLoadingFavorites(true)
       try {
           if (favoriteMovies[movieId]) {
               // Remove from favorites if already added
               await removeFavoriteService(email, movieId);
               setFavoriteMovies((prev) => ({ ...prev, [movieId]: false })); // Update state
-              setIsFavorite(false)
-              alert('Removed from favorites!');
+              setIsFavorite(false);
+              setSnackbarMessage('Removed from favorites!');
+              setSnackbarSeverity('success');
           } else {
               // Add to favorites
               await addFavoriteService(email, movieId);
               setFavoriteMovies((prev) => ({ ...prev, [movieId]: true })); // Update state
-              setIsFavorite(true)
-              alert('Added to favorites!');
+              setIsFavorite(true);
+              setSnackbarMessage('Added to favorites!');
+              setSnackbarSeverity('success');
           }
       } catch (error) {
           console.error('Error updating favorites:', error);
-          alert(`Failed to ${favoriteMovies[movieId] ? 'remove from' : 'add to'} favorites`);
+          setSnackbarMessage(`Failed to ${favoriteMovies[movieId] ? 'remove from' : 'add to'} favorites`);
+          setSnackbarSeverity('error');
+      } finally {
+          setLoadingFavorites(false)
+          setSnackbarOpen(true); // Open snackbar
       }
   } else {
-      alert('User not logged in.');
+      setSnackbarMessage('User not logged in.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true); // Open snackbar
   }
 };
 
-
 const handleAddToWatchlist = async (movieId) => {
-    const email = localStorage.getItem("email");
-    if (selectedMovie && email) {
-        try {
-            if (isInWatchlist) {
-                // Remove from watchlist if already added
-                await removeFromWatchlistService(email, selectedMovie.id);
-                setWatchlistMovies((prev) => ({ ...prev, [movieId]: false })); // Update state
-                alert('Removed from watchlist!');
-                setIsInWatchlist(false)
-            } else {
-                // Add to watchlist
-                await addToWatchlistService(email, selectedMovie.id);
-                setWatchlistMovies((prev) => ({ ...prev, [movieId]: true })); // Update state
-                alert('Added to Watchlist!');
-                setIsInWatchlist(true)
-            }
-        } catch (error) {
-            console.error('Error updating watchlist:', error);
-            alert(`Failed to ${isInWatchlist ? 'remove from' : 'add to'} watchlist`);
-        }
-    } else {
-        alert('User not logged in or no movie selected.');
-    }
+  const email = localStorage.getItem("email");
+  if (selectedMovie && email) {
+    setLoadingWatchlist(true)
+      try {
+          if (isInWatchlist) {
+              // Remove from watchlist if already added
+              await removeFromWatchlistService(email, selectedMovie.id);
+              setWatchlistMovies((prev) => ({ ...prev, [movieId]: false })); // Update state
+              setSnackbarMessage('Removed from watchlist!');
+              setIsInWatchlist(false);
+          } else {
+              // Add to watchlist
+              await addToWatchlistService(email, selectedMovie.id);
+              setWatchlistMovies((prev) => ({ ...prev, [movieId]: true })); // Update state
+              setSnackbarMessage('Added to Watchlist!');
+          }
+      } catch (error) {
+          console.error('Error updating watchlist:', error);
+          setSnackbarMessage(`Failed to ${isInWatchlist ? 'remove from' : 'add to'} watchlist`);
+          setSnackbarSeverity('error');
+      } finally {
+          setLoadingWatchlist(false)
+          setSnackbarOpen(true); // Open snackbar
+      }
+  } else {
+      setSnackbarMessage('User not logged in or no movie selected.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true); // Open snackbar
+  }
 };
 
   const handleMoodChange = (event) => {
@@ -218,7 +244,6 @@ const handleAddToWatchlist = async (movieId) => {
     
     return combinations;
   };  
-  
 
   const fetchMovies = async () => {
     const genreIds = moodsGenresMapping[selectedMood];
@@ -242,7 +267,7 @@ const handleAddToWatchlist = async (movieId) => {
       const data = await response.json();
       
       const filteredMovies = data.results.filter(movie => 
-        movie.vote_count >= 500 && movie.vote_average >= 6.5
+        movie.vote_count >= 300 && movie.vote_average >= 6.0
       );
       allMovies.push(...filteredMovies); // Collect movies from all combinations
     }
@@ -270,8 +295,18 @@ const handleAddToWatchlist = async (movieId) => {
 
   const fetchRandomMovie = async () => {
     if (selectedGenres.length === 0) return; // Ensure at least one genre is selected
+
+    let genreIds;
   
-    const genreIds = selectedGenres.join(',');
+    if (selectedGenres.length === 3) {
+      // Shuffle the selected genres and take the first 2
+      const shuffledGenres = selectedGenres.sort(() => 0.5 - Math.random());
+      genreIds = shuffledGenres.slice(0, 2).join(','); // Combine the first two shuffled genres
+    } else {
+      // If 2 or 1 genre selected, just use the selected genres
+      genreIds = selectedGenres.join(',');
+    }
+  
     const url = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${genreIds}`;
   
     const options = {
@@ -287,17 +322,18 @@ const handleAddToWatchlist = async (movieId) => {
     try {
       const response = await fetch(url, options);
       const data = await response.json();
+      
       // Filter movies based on vote count and average score
       const filteredMovies = data.results.filter(movie => 
-        movie.vote_count >= 500 && movie.vote_average >= 6.5
+        movie.vote_count >= 300 && movie.vote_average >= 6.0
       );
-      // Filter and pick 3 random movies
+  
+      // Shuffle and pick 3 random movies
       const randomMovies = filteredMovies
-      ?.sort(() => Math.random() - 0.5) // Shuffle movies
-      .slice(0, 3); // Pick 3 movies
-
+        .sort(() => Math.random() - 0.5) // Shuffle movies
+        .slice(0, 3); // Pick 3 movies
+  
       setMovies(randomMovies); // Update state with random movies
-      console.log("filteredMovies", filteredMovies);
   
       if (randomMovies?.length > 0) {
         setMoviesDetails([]); // Reset previous movie details
@@ -310,6 +346,7 @@ const handleAddToWatchlist = async (movieId) => {
       setLoading(false); // Hide loading spinner
     }
   };
+  
 
   const handleGenreChange = (event) => {
     const genreId = parseInt(event.target.value, 10);
@@ -327,12 +364,11 @@ const handleAddToWatchlist = async (movieId) => {
 
   const handleGenreChangeMobile = (event) => {
     const {
-      target: { value },
+        target: { value },
     } = event;
-  
+
     // Convert value to an array if it's not already
     const valueArray = typeof value === 'string' ? value.split(',') : value;
-  
     setSelectedGenres((prevSelected) => {
       const newSelected = valueArray.map((id) => parseInt(id, 10));
       // Allow updating only if the new selection does not exceed 3 genres
@@ -341,7 +377,27 @@ const handleAddToWatchlist = async (movieId) => {
       }
       return prevSelected; // Do not update if it exceeds 3
     });
-  };
+
+    setSelectedGenreNames((prevSelected) => {
+        const newSelected = valueArray.map((id) => parseInt(id, 10));
+        
+        // Allow updating only if the new selection does not exceed 3 genres
+        if (newSelected.length <= 4) {
+            // Find the corresponding genre names
+            const selectedGenreNames = newSelected.map((id) => {
+                const genre = genresList.find((genre) => genre.id === id);
+                return genre ? genre.name : null; // Return the genre name or null if not found
+            }).filter(name => name !== null); // Filter out any null values
+            
+            console.log("Selected Genre Names:", selectedGenreNames); // Log the selected genre names
+            return newSelected; // Return newSelected for IDs; if you need names, return selectedGenreNames instead
+        }
+        
+        return prevSelected; // Do not update if it exceeds 3
+    });
+};
+    console.log("selected genres", selectedGenres, genresList);
+
   
 
   const handleToggle = () => {
@@ -400,6 +456,7 @@ const handleAddToWatchlist = async (movieId) => {
       fetchReviews();    }
   }, [selectedMovie]);
   const fetchSimilarMovies = async (movie) => {
+    setLoadingSimilar(true); // Start loading
     try {
       const genreIds = movie.genre_ids;
   
@@ -411,32 +468,46 @@ const handleAddToWatchlist = async (movieId) => {
   
       console.log("Fetching similar movies with genre IDs:", genreIdsString);
   
-      const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
-        params: {
-          api_key: apiKey,
-          with_genres: genreIdsString,
-          'vote_average.gte': 7,
-          'vote_count.gte': 500,
-          language: 'en-US',
-          page: 1
-        }
-      });
+      const allMovies = [];
   
-      // Exclude the selected movie from the similar movies list
-      const filteredMovies = response.data.results
-        .filter(m => m.id !== movie.id)
-        .slice(0, 6);
+      // Fetch movies from pages 1, 2, and 3
+      for (let page = 1; page <= 5; page++) {
+        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
+          params: {
+            api_key: apiKey,
+            with_genres: genreIdsString,
+            'vote_average.gte': 6,
+            'vote_count.gte': 300,
+            language: 'en-US',
+            page: page
+          }
+        });
   
-      console.log("Filtered movies:", filteredMovies);
+        // Exclude the selected movie from the similar movies list
+        const filteredMovies = response.data.results.filter(m => m.id !== movie.id);
+        
+        // Add the filtered movies from this page to the allMovies array
+        allMovies.push(...filteredMovies);
+      }
   
-      setSimilarMovies(filteredMovies);
-      setLoadingSimilar(false);
-      console.log("filteredMovies",filteredMovies)
+      // Shuffle the collected movies
+      const shuffledMovies = allMovies.sort(() => 0.5 - Math.random());
+      
+      // Select a random number of movies (up to 6)
+      const randomMovies = shuffledMovies.slice(0, 6); // Take only the first 6 shuffled movies
+  
+      console.log("Randomly selected movies:", randomMovies);
+  
+      // Set the state to the randomly selected movies
+      setSimilarMovies(randomMovies);
     } catch (error) {
       console.error("Error fetching similar movies:", error);
-      setLoadingSimilar(false);
+    } finally {
+      setLoadingSimilar(false); // End loading
     }
   };
+  
+  
   
   const fetchMovieInfo = async (movie) => {
     setLoadingInfo(true);
@@ -464,16 +535,26 @@ const handleAddToWatchlist = async (movieId) => {
       setLoadingInfo(false);
     }
   };
+  const scrollToModalTop = () => {
+    if (modalContentRef.current) {
+      modalContentRef.current.scrollTop = 0; // Scroll to the top
+    }
+  };
+  useEffect(() => {
+    if (isModalOpen) {
+      scrollToModalTop(); // Scroll to top when modal opens
+    }
+  }, [isModalOpen]);
   
   const handleMovieClick = (movie) => {
-    setSelectedGenres([]);
     setSelectedMovie(movie); // Set the selected movie
     console.log("Selected movie:", movie);
     setIsModalOpen(true); // Open the modal
     fetchMovieInfo(movie); // Fetch details of the selected movie
     fetchSimilarMovies(movie); // Fetch similar movies for the selected movie
-    window.scrollTo(0, 0); // Scroll to top of the page
+    scrollToModalTop(); // Scroll to top of the modal
   };
+  
   
   const scrollToTop = () => {
     if (modalContentRef.current) {
@@ -802,6 +883,9 @@ const handleAddToWatchlist = async (movieId) => {
                   {moodMovies.map((movie) => {
                     // Find the corresponding details for the current movie
                     const details = moviesDetails?.find(detail => detail.id === movie.id);
+                    const isMovieFavorite = favoriteMovies[movie.id] || false; // Get specific movie's favorite state
+                    const isMovieInWatchlist = watchlistMovies[movie.id] || false; // Get specific movie's watchlist state
+                    
                     console.log("details",moviesDetails)
                     return (
                       <Box key={movie.id} sx={{ mb: 3 }} pl={{xs:2, sm:3.5}}>
@@ -869,30 +953,28 @@ const handleAddToWatchlist = async (movieId) => {
                               <strong>Tagline:</strong> {details?.tagline || 'N/A'}
                             </Typography>
                             <Grid container mt={1} gap={1} mb={1}>
-                            <Button onClick={() => {
-                                setSelectedMovie(movie); // Set the selected movie
-                                handleAddToFavorites(movie.id); // Pass movie.id to the function
-                            }}>
-                                {favoriteMovies[movie.id] ? (
-                                    <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
-                                ) : (
-                                    <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
-                                )}
-                            </Button>
-                              <Button onClick={() => {
-                                  setSelectedMovie(movie); // Set the selected movie
-                                  handleAddToWatchlist(movie.id); // Pass movie.id to the function
-                              }}>
-                                {watchlistMovies[movie.id] ? (
-                                    <WatchLaterIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
-                                  ) : (
-                                    <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
-                                  )}                  
-                              </Button>
+                            <Button onClick={() => handleAddToFavorites(movie.id)}disabled={loadingFavorites}>
+                              {loadingFavorites ? (
+                                  <CircularProgress size={24} /> // Loading indicator
+                              ) : isMovieFavorite ? (
+                                  <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
+                              ) : (
+                                  <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
+                              )}
+                          </Button>
+                          <Button onClick={handleAddToWatchlist} disabled={loadingWatchlist}>
+                              {loadingWatchlist ? (
+                                  <CircularProgress size={24} /> // Loading indicator
+                              ) : isMovieInWatchlist ? (
+                                  <WatchLaterIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                              ) : (
+                                  <WatchLaterOutlinedIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                              )}
+                          </Button>
                               <div>
-                                <Button onClick={handleAddToListClick}>
+                                {/* <Button onClick={handleAddToListClick}>
                                     Add to a List
-                                </Button>
+                                </Button> */}
 
                                 <Dialog open={open} onClose={handleClose}>
                                     <DialogTitle>Create a New List</DialogTitle>
@@ -920,7 +1002,7 @@ const handleAddToWatchlist = async (movieId) => {
       {/* Movie Details Modal */}
       {isModalOpen && (
         <Modal open={Boolean(selectedMovie)} onClose={handleCloseModal}>
-        <Box height={"80%"} overflow={"auto"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'80%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
+        <Box height={"80%"} ref={modalContentRef} overflow={"auto"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'80%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
           <IconButton
             onClick={handleCloseModal}
             sx={{
@@ -1029,7 +1111,7 @@ const handleAddToWatchlist = async (movieId) => {
                   {loadingSimilar ? (
                     <CircularProgress />
                   ) : (
-                    <Grid container spacing={2} ml={-1} justifyContent={'center'}>
+                    <Grid container spacing={2} justifyContent={'center'}>
                       {similarMovies.map((movie) => (
                         <Grid item xs={3.8} md={5.8} lg={5.8} xl={3.8} key={movie.id} onClick={() => {handleMovieClick(movie); scrollToTop();}}>
                           <img
@@ -1088,6 +1170,11 @@ const handleAddToWatchlist = async (movieId) => {
         </Box>
       </Modal>
       )}
+                  <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         <Modal open={Boolean(isRandomMovie)} onClose={handleCloseRandomModal}>
           <Box height={"80%"} overflow={"auto"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'90%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
           <IconButton
@@ -1108,34 +1195,47 @@ const handleAddToWatchlist = async (movieId) => {
             </Typography>  
             <Grid display={'flex'} flexDirection={'column'} alignItems={'center'} gap={1}>
       {isSmallScreen ? (
-        <FormControl sx={{ mb: 2, width:"98%" }}>
+        <FormControl sx={{ mb: 2, width: "98%" }}>
           <InputLabel id="genre-select-label">Select Genres</InputLabel>
           <Select
-            labelId="genre-select-label"
-            multiple
-            value={selectedGenres}
-            onChange={handleGenreChangeMobile}
-            renderValue={(selected) => selected.join(', ')} // Display selected genres
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  maxHeight: 300,
-                  "& .MuiMenuItem-root": {
-                    display: 'flex',
-                    justifyContent: 'space-between',
+              labelId="genre-select-label"
+              multiple
+              value={selectedGenres}
+              onChange={handleGenreChangeMobile}
+              renderValue={(selected) => {
+                  const selectedNames = selected.map((id) => {
+                      const genre = genresList.find((genre) => genre.id === id);
+                      return genre ? genre.name : null; // Return the genre name or null if not found
+                  }).filter(name => name !== null); // Filter out any null values
+
+                  return selectedNames.join(', '); // Join the names for display
+              }}
+              MenuProps={{
+                  PaperProps: {
+                      sx: {
+                          maxHeight: 300,
+                          "& .MuiMenuItem-root": {
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                          },
+                      },
                   },
-                },
-              },
-            }}
+              }}
           >
-            {genresList.map((genre) => (
-              <MenuItem key={genre.id} value={genre.id} sx={{display:"flex",justifyContent:"start !important"}}>
-                <Checkbox checked={selectedGenres.includes(genre.id)} />
-                {genre.name}
-              </MenuItem>
-            ))}
+              {genresList.map((genre) => (
+                  <MenuItem
+                      key={genre.id}
+                      value={genre.id}
+                      sx={{ display: "flex", justifyContent: "start !important" }}
+                      disabled={!selectedGenres.includes(genre.id) && selectedGenres.length >= 3} // Disable if not selected and 3 genres are already selected
+                  >
+                      <Checkbox checked={selectedGenres.includes(genre.id)} />
+                      {genre.name}
+                  </MenuItem>
+              ))}
           </Select>
-        </FormControl>
+      </FormControl>
+
       ) : (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: "center" }}>
           {genresList.map((genre) => (
