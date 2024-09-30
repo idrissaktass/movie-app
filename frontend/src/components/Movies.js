@@ -187,20 +187,24 @@ const handleAddToFavorites = async (movieId) => {
 
 const handleAddToWatchlist = async (movieId) => {
   const email = localStorage.getItem("email");
-  if (selectedMovie && email) {
+  if (email) {
     setLoadingWatchlist(true)
       try {
-          if (isInWatchlist) {
+          if (watchlistMovies[movieId]) {
               // Remove from watchlist if already added
-              await removeFromWatchlistService(email, selectedMovie.id);
+              await removeFromWatchlistService(email, movieId);
               setWatchlistMovies((prev) => ({ ...prev, [movieId]: false })); // Update state
               setSnackbarMessage('Removed from watchlist!');
               setIsInWatchlist(false);
+              setSnackbarSeverity('success');
           } else {
               // Add to watchlist
-              await addToWatchlistService(email, selectedMovie.id);
+              await addToWatchlistService(email, movieId);
               setWatchlistMovies((prev) => ({ ...prev, [movieId]: true })); // Update state
               setSnackbarMessage('Added to Watchlist!');
+              setSnackbarSeverity('success');
+              setIsInWatchlist(true);
+
           }
       } catch (error) {
           console.error('Error updating watchlist:', error);
