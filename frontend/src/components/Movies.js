@@ -250,6 +250,7 @@ const handleAddToWatchlist = async (movieId) => {
   };  
 
   const fetchMovies = async () => {
+    setLoading(true); // Show loading spinner
     const genreIds = moodsGenresMapping[selectedMood];
     console.log("genreIds", genreIds);
   
@@ -291,6 +292,8 @@ const handleAddToWatchlist = async (movieId) => {
       // Fetch details for each random movie
       await Promise.all(randomMovies.map((movie) => fetchMovieInfo(movie)));
     }
+    setLoading(false); // Show loading spinner
+
   };
   
   const handleSubmit = () => {
@@ -879,9 +882,17 @@ const handleAddToWatchlist = async (movieId) => {
             <Button sx={{width:{xs:"90%", md:"50%"}, backgroundColor:"#934c14"}} variant="contained" onClick={handleSubmit} disabled={!selectedMood}>
               Find Movies
             </Button>
-            
           </Grid>
-          {loading && <CircularProgress sx={{ mt: 2 }} />}
+          {loading &&             
+            <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="60%" // or any specific height you need
+            >
+              <CircularProgress size={60} /> {/* Adjust the size as needed */}
+            </Box>
+            }
               {moodMovies?.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   {moodMovies.map((movie) => {
@@ -1262,7 +1273,16 @@ const handleAddToWatchlist = async (movieId) => {
         Find a Movie
       </Button>
     </Grid>
-            {loading && <CircularProgress sx={{ mt: 2 }} />}
+            {loading &&
+              <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="60%" // or any specific height you need
+              >
+                <CircularProgress size={60} /> {/* Adjust the size as needed */}
+              </Box>
+            }
             {movies?.length > 0 && (
               <Box sx={{ mt: 2 }}>
                 {movies.map((movie) => {
