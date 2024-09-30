@@ -433,7 +433,7 @@ const handleAddToWatchlist = async () => {
                                   onClick={() => console.log(movie.title)}
                                 />
                                 <Typography variant="body2" mt={1} textAlign="center">
-                                  {movie.title} ({movie.vote_average}/10)
+                                  {movie.title} {(Math.round(movie.vote_average * 10) / 10)}/10
                                 </Typography>
                               </Grid>
                             ))}
