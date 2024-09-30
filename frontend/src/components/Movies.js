@@ -248,7 +248,6 @@ const handleAddToWatchlist = async (movieId) => {
     
     return combinations;
   };  
-
   const fetchMovies = async () => {
     setLoading(true); // Show loading spinner
     const genreIds = moodsGenresMapping[selectedMood];
@@ -259,24 +258,31 @@ const handleAddToWatchlist = async (movieId) => {
   
     // Fetch movies for each combination
     for (const combination of combinations) {
-      const url = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${combination}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0MDRiYzJhNDcxMzljM2E1ZDgyNjgxNGYwMzc5NGIyMSIsIm5iZiI6MTcyNjYxMzg3MC43NTcwODIsInN1YiI6IjY1NGEwN2JjMjg2NmZhMDBjNDI1OWJmNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7jP0jl8WExn2tVvRBfkna_WrlXoGYbYCZDKcAwVoRbA'
-        },
-      };
+      for (let page = 1; page <= 5; page++) { // Fetch 5 pages for each combination
+        const url = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${combination}&page=${page}`;
+        const options = {
+          method: 'GET',
+          headers: {
+            accept: 'application/json',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0MDRiYzJhNDcxMzljM2E1ZDgyNjgxNGYwMzc5NGIyMSIsIm5iZiI6MTcyNjYxMzg3MC43NTcwODIsInN1YiI6IjY1NGEwN2JjMjg2NmZhMDBjNDI1OWJmNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7jP0jl8WExn2tVvRBfkna_WrlXoGYbYCZDKcAwVoRbA'
+          },
+        };
   
-      const response = await fetch(url, options);
-      const data = await response.json();
-      
-      const filteredMovies = data.results.filter(movie => 
-        movie.vote_count >= 300 && movie.vote_average >= 6.0
-      );
-      allMovies.push(...filteredMovies); // Collect movies from all combinations
+        try {
+          const response = await fetch(url, options);
+          const data = await response.json();
+          
+          // Filter movies based on vote count and average score
+          const filteredMovies = data.results.filter(movie => 
+            movie.vote_count >= 300 && movie.vote_average >= 6.0
+          );
+          allMovies.push(...filteredMovies); // Collect movies from all combinations and pages
+        } catch (error) {
+          console.error(`Error fetching movies for page ${page} of combination ${combination}:`, error);
+        }
+      }
     }
-  
+    console.log("123",allMovies)
     // Shuffle and pick unique movies
     const uniqueMovies = Array.from(new Set(allMovies.map(movie => movie.id))) // Ensure uniqueness by ID
       .map(id => allMovies.find(movie => movie.id === id));
@@ -292,9 +298,10 @@ const handleAddToWatchlist = async (movieId) => {
       // Fetch details for each random movie
       await Promise.all(randomMovies.map((movie) => fetchMovieInfo(movie)));
     }
-    setLoading(false); // Show loading spinner
-
+  
+    setLoading(false); // Hide loading spinner
   };
+  
   
   const handleSubmit = () => {
     fetchMovies();
@@ -302,7 +309,7 @@ const handleAddToWatchlist = async (movieId) => {
 
   const fetchRandomMovie = async () => {
     if (selectedGenres.length === 0) return; // Ensure at least one genre is selected
-
+  
     let genreIds;
   
     if (selectedGenres.length === 3) {
@@ -314,7 +321,7 @@ const handleAddToWatchlist = async (movieId) => {
       genreIds = selectedGenres.join(',');
     }
   
-    const url = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${genreIds}`;
+    const baseUrl = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${genreIds}`;
   
     const options = {
       method: 'GET',
@@ -326,13 +333,23 @@ const handleAddToWatchlist = async (movieId) => {
   
     setMovies([]); // Clear previous movies
     setLoading(true); // Show loading spinner
+  
     try {
-      const response = await fetch(url, options);
-      const data = await response.json();
-      
+      let allMovies = [];
+  
+      // Fetch 5 pages of movie results
+      for (let page = 1; page <= 8; page++) {
+        const response = await fetch(`${baseUrl}&page=${page}`, options);
+        const data = await response.json();
+  
+        allMovies = [...allMovies, ...data.results];
+      }
+  
+      console.log("All fetched movies:", allMovies);
+  
       // Filter movies based on vote count and average score
-      const filteredMovies = data.results.filter(movie => 
-        movie.vote_count >= 300 && movie.vote_average >= 6.0
+      const filteredMovies = allMovies.filter(
+        movie => movie.vote_count >= 300 && movie.vote_average >= 6.0
       );
   
       // Shuffle and pick 3 random movies
@@ -342,10 +359,10 @@ const handleAddToWatchlist = async (movieId) => {
   
       setMovies(randomMovies); // Update state with random movies
   
-      if (randomMovies?.length > 0) {
+      if (randomMovies.length > 0) {
         setMoviesDetails([]); // Reset previous movie details
         // Fetch details for each random movie
-        await Promise.all(randomMovies.map((movie) => fetchMovieInfo(movie)));
+        await Promise.all(randomMovies.map(movie => fetchMovieInfo(movie)));
       }
     } catch (error) {
       console.error('Error fetching movies:', error);
@@ -883,7 +900,7 @@ const handleAddToWatchlist = async (movieId) => {
               Find Movies
             </Button>
           </Grid>
-          {loading &&             
+          {loading ? (
             <Box
             display="flex"
             justifyContent="center"
@@ -892,123 +909,125 @@ const handleAddToWatchlist = async (movieId) => {
             >
               <CircularProgress size={60} /> {/* Adjust the size as needed */}
             </Box>
-            }
-              {moodMovies?.length > 0 && (
-                <Box sx={{ mt: 2 }}>
-                  {moodMovies.map((movie) => {
-                    // Find the corresponding details for the current movie
-                    const details = moviesDetails?.find(detail => detail.id === movie.id);
-                    const isMovieFavorite = favoriteMovies[movie.id] || false; // Get specific movie's favorite state
-                    const isMovieInWatchlist = watchlistMovies[movie.id] || false; // Get specific movie's watchlist state
-                    
-                    console.log("details",moviesDetails)
-                    return (
-                      <Box key={movie.id} sx={{ mb: 3 }} pl={{xs:2, sm:3.5}}>
-                        <Typography variant="h6">{movie.title}</Typography>
-                        <Grid 
-                          mb={{ xs: "15px", md: "20px" }} 
-                          item 
-                          xs={11.5} 
-                          pr={{ xs: "10px", md: "20px" }} 
-                          display={'flex'}
-                          flexDirection={{xs:"column", md:"unset"}}
-                          gap={2}
-                          paddingBlock={{ xs: "10px", md: "unset" }} 
-                          paddingLeft={{ xs: "10px", md: "0px" }} 
-                          sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)' }}>
-                            <Grid display={'flex'} justifyContent={'center'}>
-                              <Box 
-                              height={{xs:"50%", sm:"600px", md:"100%"}}
-                              width={{xs:"100%", sm:"70%", md:"250px"}} 
-                              overflow="hidden" 
-                              display={"flex"} 
-                              justifyContent="center"
-                            >
-                              <Box
-                                component="img"
-                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                                alt={movie.title}
-                                sx={{ 
-                                  width: '100%',       // Kutunun genişliğine tam sığacak
-                                  height: 'auto',      // Kutunun yüksekliğine tam sığacak
-                                  objectFit: 'cover',  // Resim kutunun içinde tam görünür
-                                }}
-                              />
-                            </Box>
-                            </Grid>
-                          <Grid>
-                            <Typography variant="body2" mt={2}>
-                              {movie.overview}
-                            </Typography>
-                            <Typography variant="body1" mt={2}>
-                              <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'N/A'}/10
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Release Date:</strong> {details?.release_date || 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Budget:</strong> {details?.budget ? `$${details.budget.toLocaleString()}` : 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Revenue:</strong> {details?.revenue ? `$${details.revenue.toLocaleString()}` : 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Production Companies:</strong> {details?.production_companies?.map(company => company.name).join(', ') || 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Tagline:</strong> {details?.tagline || 'N/A'}
-                            </Typography>
-                            <Grid container mt={1} gap={1} mb={1}>
-                            <Button onClick={() => handleAddToFavorites(movie.id)}disabled={loadingFavorites}>
-                              {loadingFavorites ? (
-                                  <CircularProgress size={24} /> // Loading indicator
-                              ) : isMovieFavorite ? (
-                                  <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
-                              ) : (
-                                  <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
-                              )}
-                          </Button>
-                          <Button onClick={handleAddToWatchlist} disabled={loadingWatchlist}>
-                              {loadingWatchlist ? (
-                                  <CircularProgress size={24} /> // Loading indicator
-                              ) : isMovieInWatchlist ? (
-                                  <WatchLaterIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
-                              ) : (
-                                  <WatchLaterOutlinedIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
-                              )}
-                          </Button>
-                              <div>
-                                {/* <Button onClick={handleAddToListClick}>
-                                    Add to a List
-                                </Button> */}
+          ) : (
+            moodMovies?.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                {moodMovies.map((movie) => {
+                  // Find the corresponding details for the current movie
+                  const details = moviesDetails?.find(detail => detail.id === movie.id);
+                  const isMovieFavorite = favoriteMovies[movie.id] || false; // Get specific movie's favorite state
+                  const isMovieInWatchlist = watchlistMovies[movie.id] || false; // Get specific movie's watchlist state
+                  
+                  console.log("details",moviesDetails)
+                  return (
+                    <Box key={movie.id} sx={{ mb: 3 }} pl={{xs:2, sm:3.5}}>
+                      <Typography variant="h6">{movie.title}</Typography>
+                      <Grid 
+                        mb={{ xs: "15px", md: "20px" }} 
+                        item 
+                        xs={11.5} 
+                        pr={{ xs: "10px", md: "20px" }} 
+                        display={'flex'}
+                        flexDirection={{xs:"column", md:"unset"}}
+                        gap={2}
+                        paddingBlock={{ xs: "10px", md: "unset" }} 
+                        paddingLeft={{ xs: "10px", md: "0px" }} 
+                        sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)' }}>
+                          <Grid display={'flex'} justifyContent={'center'}>
+                            <Box 
+                            height={{xs:"50%", sm:"600px", md:"100%"}}
+                            width={{xs:"100%", sm:"70%", md:"250px"}} 
+                            overflow="hidden" 
+                            display={"flex"} 
+                            justifyContent="center"
+                          >
+                            <Box
+                              component="img"
+                              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                              alt={movie.title}
+                              sx={{ 
+                                width: '100%',       // Kutunun genişliğine tam sığacak
+                                height: 'auto',      // Kutunun yüksekliğine tam sığacak
+                                objectFit: 'cover',  // Resim kutunun içinde tam görünür
+                              }}
+                            />
+                          </Box>
+                          </Grid>
+                        <Grid>
+                          <Typography variant="body2" mt={2}>
+                            {movie.overview}
+                          </Typography>
+                          <Typography variant="body1" mt={2}>
+                            <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'N/A'}/10
+                          </Typography>
+                          <Typography variant="body1" mt={1}>
+                            <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
+                          </Typography>
+                          <Typography variant="body1" mt={1}>
+                            <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'N/A'}
+                          </Typography>
+                          <Typography variant="body1" mt={1}>
+                            <strong>Release Date:</strong> {details?.release_date || 'N/A'}
+                          </Typography>
+                          <Typography variant="body1" mt={1}>
+                            <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'N/A'}
+                          </Typography>
+                          <Typography variant="body1" mt={1}>
+                            <strong>Budget:</strong> {details?.budget ? `$${details.budget.toLocaleString()}` : 'N/A'}
+                          </Typography>
+                          <Typography variant="body1" mt={1}>
+                            <strong>Revenue:</strong> {details?.revenue ? `$${details.revenue.toLocaleString()}` : 'N/A'}
+                          </Typography>
+                          <Typography variant="body1" mt={1}>
+                            <strong>Production Companies:</strong> {details?.production_companies?.map(company => company.name).join(', ') || 'N/A'}
+                          </Typography>
+                          <Typography variant="body1" mt={1}>
+                            <strong>Tagline:</strong> {details?.tagline || 'N/A'}
+                          </Typography>
+                          <Grid container mt={1} gap={1} mb={1}>
+                          <Button onClick={() => handleAddToFavorites(movie.id)}disabled={loadingFavorites}>
+                            {loadingFavorites ? (
+                                <CircularProgress size={24} /> // Loading indicator
+                            ) : isMovieFavorite ? (
+                                <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
+                            ) : (
+                                <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
+                            )}
+                        </Button>
+                        <Button onClick={handleAddToWatchlist} disabled={loadingWatchlist}>
+                            {loadingWatchlist ? (
+                                <CircularProgress size={24} /> // Loading indicator
+                            ) : isMovieInWatchlist ? (
+                                <WatchLaterIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                            ) : (
+                                <WatchLaterOutlinedIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                            )}
+                        </Button>
+                            <div>
+                              {/* <Button onClick={handleAddToListClick}>
+                                  Add to a List
+                              </Button> */}
 
-                                <Dialog open={open} onClose={handleClose}>
-                                    <DialogTitle>Create a New List</DialogTitle>
-                                    <DialogContent>
-                                        <CreateList selectedMovie={selectedMovie}  onClose={handleClose} />
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button onClick={handleClose}>Cancel</Button>
-                                    </DialogActions>
-                                </Dialog>
-                            </div>
-                            </Grid>
+                              <Dialog open={open} onClose={handleClose}>
+                                  <DialogTitle>Create a New List</DialogTitle>
+                                  <DialogContent>
+                                      <CreateList selectedMovie={selectedMovie}  onClose={handleClose} />
+                                  </DialogContent>
+                                  <DialogActions>
+                                      <Button onClick={handleClose}>Cancel</Button>
+                                  </DialogActions>
+                              </Dialog>
+                          </div>
                           </Grid>
                         </Grid>
-                      </Box>
-                    );
-                  })}
-                </Box>
-              )}
+                      </Grid>
+                    </Box>
+                  );
+                })}
+              </Box>
+            )
+          )             
+            }
         </Box>
       </Modal>
         </Grid>
