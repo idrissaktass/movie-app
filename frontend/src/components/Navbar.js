@@ -93,7 +93,9 @@ const Navbar = () => {
     handleMenuClose();
     window.location.reload();
   };
-
+  const handleHome = () => {
+    navigate("/");
+  }
   const handleFavoritesOpen = async () => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -174,6 +176,9 @@ const Navbar = () => {
           </Typography>
         </Grid>
         <Box sx={{ display: { xs: "none", md: "flex" }, ml: 2 }}>
+          <Button color="inherit" onClick={handleHome}>
+            Home
+          </Button>
           <Button color="inherit" onClick={handleSearchOptions}>
             Search Movies
           </Button>
@@ -214,6 +219,9 @@ const Navbar = () => {
                 <MenuIcon />
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                <Button color="inherit" onClick={handleHome}>
+                  Home
+                </Button>
                 <MenuItem onClick={handleWatchlistOpen}>Watchlist</MenuItem>
                 <MenuItem onClick={handleFavoritesOpen}>Favorites</MenuItem>
                 <MenuItem onClick={handleSearchOptions}>Search Movies</MenuItem>
