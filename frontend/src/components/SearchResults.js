@@ -53,8 +53,9 @@ const SearchResults = ({ onClose, SearchResults  }) => {
   const handleOpenModal = (movie) => {
     setSelectedMovie(movie);
     setIsMovieModalOpen(true); // Open the MovieModal
-    console.log("Opened modal for movie:", movie); // Debugging log
+    console.log("xd",movie)
   };
+  
   const refreshSearch = async () => {
     fetchMovies()
   };
@@ -220,9 +221,8 @@ const SearchResults = ({ onClose, SearchResults  }) => {
             <Grid container gap={1} justifyContent={'center'} mt={2}>
               {movies.map((movie) => (
                 <Grid item xs={5} sm={2.8} md={2} lg={2} key={movie.id}>
-                  <Box position="relative">
+                  <Box position="relative" onClick={() => handleOpenModal(movie)}>
                     <img
-                      onClick={() => handleOpenModal(movie)}
                       src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                       alt={movie.title}
                       style={{ width: '100%', height: 'auto' }}
