@@ -10,7 +10,7 @@ import {
   MenuItem,
   Button,
   CircularProgress,
-  Grid,
+  Grid,useMediaQuery
 } from "@mui/material";
 import { Menu as MenuIcon, Search as SearchIcon } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
@@ -20,6 +20,7 @@ import FavoritesModal from "./FavoritesModal";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { fetchWatchlistService, fetchFavoritesService } from "../services/AuthService";
+import { useTheme } from "@mui/material/styles";
 
 // Style for the search bar
 const Search = styled("div")(({ theme }) => ({
@@ -71,6 +72,8 @@ const Navbar = () => {
   const [favorites, setFavorites] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -124,12 +127,12 @@ const Navbar = () => {
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
-    const refreshWatchlist = async () => {
-      handleWatchlistOpen()
-  };
-  const refreshFavorites = async () => {
-    handleFavoritesOpen()
-};
+  //   const refreshWatchlist = async () => {
+  //     handleWatchlistOpen()
+  // };
+  // const refreshFavorites = async () => {
+  //   handleFavoritesOpen()
+  // };
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
     if (searchQuery) {
@@ -200,31 +203,33 @@ const Navbar = () => {
         </Box>
 
         {/* Hamburger Menu for Mobile */}
-        <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-          <IconButton
-            edge="end"
-            color="inherit"
-            aria-label="menu"
-            onClick={handleMenuOpen}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-            <MenuItem onClick={handleWatchlistOpen}>Watchlist</MenuItem>
-            <MenuItem onClick={handleFavoritesOpen}>Favorites</MenuItem>
-            <MenuItem onClick={handleSearchOptions}>Search Movies</MenuItem>
+          {isSmallScreen && (
+            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleMenuOpen}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                <MenuItem onClick={handleWatchlistOpen}>Watchlist</MenuItem>
+                <MenuItem onClick={handleFavoritesOpen}>Favorites</MenuItem>
+                <MenuItem onClick={handleSearchOptions}>Search Movies</MenuItem>
 
-            {isAuthenticated ? (
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
-            ) : (
-              <MenuItem onClick={() => navigate("/login")}>Login</MenuItem>
-            )}
-          </Menu>
-        </Box>
+                {isAuthenticated ? (
+                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                ) : (
+                  <MenuItem onClick={() => navigate("/login")}>Login</MenuItem>
+                )}
+              </Menu>
+            </Box>
+          )}
 
         {/* Modals for Watchlist and Favorites */}
-        {showWatchlist && <WatchlistModal onClose={() => setShowWatchlist(false)} watchlist={watchlist} />}
-        {showFavorites && <FavoritesModal onClose={() => setShowFavorites(false)} favorites={favorites} />}
+        {showWatchlist && <WatchlistModal onClose={() => setShowWatchlist(false)} watchlist={watchlist}/>}
+        {showFavorites && <FavoritesModal onClose={() => setShowFavorites(false)} favorites={favorites}/>}
       </Toolbar>
     </AppBar>
   );
