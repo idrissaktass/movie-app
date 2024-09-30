@@ -219,9 +219,7 @@ const Navbar = () => {
                 <MenuIcon />
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                <Button color="inherit" onClick={handleHome}>
-                  Home
-                </Button>
+                <MenuItem onClick={handleHome}>Home</MenuItem>
                 <MenuItem onClick={handleWatchlistOpen}>Watchlist</MenuItem>
                 <MenuItem onClick={handleFavoritesOpen}>Favorites</MenuItem>
                 <MenuItem onClick={handleSearchOptions}>Search Movies</MenuItem>
