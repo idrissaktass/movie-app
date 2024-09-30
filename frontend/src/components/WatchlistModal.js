@@ -4,7 +4,7 @@ import axios from "axios";
 import MovieModal from "./MovieModal";
 import CloseIcon from '@mui/icons-material/Close'; // Import the Close icon
 
-const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
+const WatchlistModal = ({ onClose, watchlist }) => {
     const [moviesDetails, setMoviesDetails] = useState([]);
     const [loadingInfo, setLoadingInfo] = useState(true);   
     const [selectedMovie, setSelectedMovie] = useState(null); // State to hold the selected movie
@@ -14,7 +14,6 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
     const handleOpenModal = (movie) => {
         setSelectedMovie(movie);
         setIsMovieModalOpen(true); // Open the MovieModal
-        refreshWatchlist(); // Call the refresh function here
     };
 
     const handleCloseModal = () => {
@@ -70,18 +69,19 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
                     bgcolor: 'background.paper', 
                     border: '2px solid #000', 
                     boxShadow: 24, 
-                    p: 4, 
-                    maxWidth: 600, 
+                    maxWidth: 600,
+                    p:2,
+                    width:{xs:"80%", sm:"60%", md:"40%"},
                     margin: 'auto',
                     height:"70%",
                     overflow:"auto", position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
                 }}>
                     <IconButton
-                        onClick={handleCloseModal}
+                        onClick={onClose}
                         sx={{
                         position: 'sticky',
-                        top: 5,           // Stick the button to the top of the scrolling area
-                        left: 5,
+                        top: 0,           // Stick the button to the top of the scrolling area
+                        left: 0,
                         color: 'text.secondary',
                         zIndex: 999,
                         bgcolor: 'white', // Add background color if needed for visibility
@@ -97,37 +97,39 @@ const WatchlistModal = ({ onClose, watchlist, refreshWatchlist }) => {
                             <CircularProgress /> // Show a loading spinner while fetching
                         ) : (
                             moviesDetails.length > 0 ? (
-                                currentMovies.map((movie, index) => (
-                                    <>
-                                        <Grid display={"flex"} alignItems={"center"} my={0.5} onClick={() => handleOpenModal(movie)}
-                                            sx={{ cursor: 'pointer', background: {xs:'linear-gradient(to right, #ff923c42, #ff923c17)'}}}>
-                                            <Grid item xs={5.5} sm={3.5} key={movie.id}>
-                                                <Box
-                                                component="img"
-                                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                                                alt={movie.title}
-                                                onClick={() => handleOpenModal(movie)}
-                                                sx={{width: {xs:"100%"},cursor: 'pointer', position: 'relative', alignSelf:"center" }}
-                                                />                
-                                                <Typography>{`${movie.title} (${movie.release_date.split('-')[0]})`}</Typography>
+                                <>
+                                    <Grid container justifyContent={"center"} gap={2}>
+                                        {currentMovies.map((movie) => (
+                                            <Grid xs={5.5} sm={3.5}  alignItems={"center"} my={0.5} onClick={() => handleOpenModal(movie)}
+                                            sx={{ cursor: 'pointer'}}>
+                                                <Grid itemkey={movie.id}>
+                                                    <Box
+                                                    component="img"
+                                                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                                    alt={movie.title}
+                                                    onClick={() => handleOpenModal(movie)}
+                                                    sx={{width: {xs:"100%"},cursor: 'pointer', position: 'relative', alignSelf:"center" }}
+                                                    />                
+                                                    <Typography>{`${movie.title} (${movie.release_date.split('-')[0]})`}</Typography>
+                                                </Grid>
                                             </Grid>
-                                            </Grid>
-                                    </>
-                                ))
+                                        ))}
+                                    </Grid>
+                                    <Box display="flex" justifyContent="center" mt={2}>
+                                        <Pagination
+                                        count={Math.ceil(moviesDetails.length / moviesPerPage)}
+                                        page={currentPage}
+                                        onChange={handlePageChange}
+                                        color="primary"
+                                        />
+                                    </Box>
+                                </>
+                                
                             ) : (
-                                <Typography variant="body1">No movies in your watchlist.</Typography>
+                                <Typography variant="body1" mt={3}>No movies in your Favorites.</Typography>
                             )
                         )}
                     </Box>
-                    <Box display="flex" justifyContent="center" mt={2}>
-                        <Pagination
-                        count={Math.ceil(moviesDetails.length / moviesPerPage)}
-                        page={currentPage}
-                        onChange={handlePageChange}
-                        color="primary"
-                        />
-                    </Box>
-                    <Button onClick={onClose} color="primary">Close</Button>
                 </Box>
             </Modal>
             {isMovieModalOpen && ( // Render MovieModal if it's open
