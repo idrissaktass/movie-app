@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext  } from 'react';
-import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, List, ListItem, Modal, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, DialogActions,Snackbar, DialogContent, DialogTitle, Grid,Alert, IconButton, List, ListItem, Modal, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
@@ -11,7 +11,7 @@ import { addFavoriteService, addToWatchlistService, removeFavoriteService, remov
 const apiKey = '404bc2a47139c3a5d826814f03794b21'; // TMDB API key
 
 
-const MovieModal = ({ selectedMovie, onOpen  }) => {
+const MovieModal = ({ selectedMovie, onOpen, onClose  }) => {
   const [open, setOpen] = useState(false);
   const [loadingInfo, setLoadingInfo] = useState(true);
   const [movieDetails, setMovieDetails] = useState(null);
@@ -28,6 +28,20 @@ const MovieModal = ({ selectedMovie, onOpen  }) => {
   const [moviesDetails, setMoviesDetails] = useState([]); // Ensure this is an array
   const [isModalOpen, setIsModalOpen] = useState(true); // Modal open state
   const [isFavorite, setIsFavorite] = useState(false); // Modal open state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
+  const [loadingWatchlist, setLoadingWatchlist] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+  const topScrollRef = useRef(null); // Create a ref for the top scroll div
+
+  const handleSnackbarClose = (event, reason) => {
+      if (reason === 'clickaway') {
+          return;
+      }
+      setSnackbarOpen(false);
+  };
+
   console.log("1234")
   useEffect(() => {
     const checkUserLists = async () => {
@@ -48,16 +62,49 @@ const MovieModal = ({ selectedMovie, onOpen  }) => {
       setIsInWatchlist(watchlist.includes(movieId));
     }}; checkUserLists();
   }, [selectedMovie]);
+  // const smoothScrollTo = (target) => {
+  //   const scrollContainer = target;
+  //   const targetPosition = 0; // Scroll to the top of the container
+  //   const startPosition = scrollContainer.scrollTop;
+  //   const distance = targetPosition - startPosition;
+  //   const duration = 500; // Duration in milliseconds
+  //   let startTime = null;
+  
+  //   const animation = (currentTime) => {
+  //     if (!startTime) startTime = currentTime;
+  //     const timeElapsed = currentTime - startTime;
+  //     const progress = Math.min(timeElapsed / duration, 1);
+  //     scrollContainer.scrollTop = startPosition + distance * progress;
+  
+  //     if (timeElapsed < duration) {
+  //       requestAnimationFrame(animation);
+  //     }
+  //   };
+  
+  //   requestAnimationFrame(animation);
+  // };
+  // const scrollToModalTop = () => {
+  //   if (modalContentRef.current) {
+  //     smoothScrollTo(modalContentRef.current); // Call custom smooth scroll
+  //   }
+  // };
 
-  const scrollToTop = () => {
+  const scrollToModalTop = () => {
     if (modalContentRef.current) {
-      modalContentRef.current.scrollTop = 0;
+      modalContentRef.current.scrollTop = 0; // Scroll to the top
     }
   };
+  useEffect(() => {
+    if (isModalOpen) {
+      scrollToModalTop(); // Scroll to top when modal opens
+    }
+  }, [isModalOpen]);
+
   const handleSimilarMovieClick = (movie) => {
-    setTimeout(() => {
-      onOpen(movie); // Open the modal with the selected similar movie
-    }, 100); // Optional: add a delay for a smoother experience
+    console.log("Selected movie:", movie);
+    fetchMovieInfo(movie); // Fetch details of the selected movie
+    fetchSimilarMovies(movie); // Fetch similar movies for the selected movie
+    scrollToModalTop(); // Scroll to top of the modal
   };
   
   useEffect(() => {
@@ -81,6 +128,7 @@ const MovieModal = ({ selectedMovie, onOpen  }) => {
       fetchReviews();    }
   }, [selectedMovie]);
   const fetchSimilarMovies = async (movie) => {
+    setLoadingSimilar(true); // Start loading
     try {
       const genreIds = movie.genre_ids || (movie.genres && movie.genres.map(genre => genre.id));
   
@@ -92,30 +140,42 @@ const MovieModal = ({ selectedMovie, onOpen  }) => {
   
       console.log("Fetching similar movies with genre IDs:", genreIdsString);
   
-      const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
-        params: {
-          api_key: apiKey,
-          with_genres: genreIdsString,
-          'vote_average.gte': 7,
-          'vote_count.gte': 500,
-          language: 'en-US',
-          page: 1
-        }
-      });
+      const allMovies = [];
   
-      // Exclude the selected movie from the similar movies list
-      const filteredMovies = response.data.results
-        .filter(m => m.id !== movie.id)
-        .slice(0, 6);
+      // Fetch movies from pages 1, 2, and 3
+      for (let page = 1; page <= 5; page++) {
+        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
+          params: {
+            api_key: apiKey,
+            with_genres: genreIdsString,
+            'vote_average.gte': 6,
+            'vote_count.gte': 300,
+            language: 'en-US',
+            page: page
+          }
+        });
   
-      console.log("Filtered movies:", filteredMovies);
+        // Exclude the selected movie from the similar movies list
+        const filteredMovies = response.data.results.filter(m => m.id !== movie.id);
+        
+        // Add the filtered movies from this page to the allMovies array
+        allMovies.push(...filteredMovies);
+      }
   
-      setSimilarMovies(filteredMovies);
-      setLoadingSimilar(false);
-      console.log("filteredMovies",filteredMovies)
+      // Shuffle the collected movies
+      const shuffledMovies = allMovies.sort(() => 0.5 - Math.random());
+      
+      // Select a random number of movies (up to 6)
+      const randomMovies = shuffledMovies.slice(0, 6); // Take only the first 6 shuffled movies
+  
+      console.log("Randomly selected movies:", randomMovies);
+  
+      // Set the state to the randomly selected movies
+      setSimilarMovies(randomMovies);
     } catch (error) {
       console.error("Error fetching similar movies:", error);
-      setLoadingSimilar(false);
+    } finally {
+      setLoadingSimilar(false); // End loading
     }
   };
   // const handleMovieClick = (movie) => {
@@ -166,50 +226,70 @@ const handleAddToFavorites = async () => {
   const email = localStorage.getItem("email");
 
   if (selectedMovie && email) {
-    try {
-      if (isFavorite) {
-        // Remove from favorites if already added
-        await removeFavoriteService(email, selectedMovie.id);
-        setIsFavorite(prev => prev.filter(id => id !== selectedMovie.id)); // Update state
-        alert('Removed from favorites!');
-      } else {
-        // Add to favorites
-        await addFavoriteService(email, selectedMovie.id);
-        setIsFavorite(prev => [...prev, selectedMovie.id]); // Update state
-        alert('Added to favorites!');
-      }
-    } catch (error) {
-      console.error('Error updating favorites:', error);
-      alert(`Failed to ${isFavorite ? 'remove from' : 'add to'} favorites`);
+    setLoadingFavorites(true); // Start loading
+      try {
+          if (isFavorite) {
+              // Remove from favorites if already added
+              await removeFavoriteService(email, selectedMovie.id);
+              setIsFavorite(false); // Update state
+              setSnackbarMessage('Removed from favorites!'); // Use Snackbar instead of alert
+              setSnackbarSeverity('success');
+          } else {
+              // Add to favorites
+              await addFavoriteService(email, selectedMovie.id);
+              setIsFavorite(true); // Update state
+              setSnackbarMessage('Added to favorites!'); // Use Snackbar instead of alert
+              setSnackbarSeverity('success');
+          }
+      } catch (error) {
+          console.error('Error updating favorites:', error);
+          setSnackbarMessage(`Failed to ${isFavorite ? 'remove from' : 'add to'} favorites`); // Use Snackbar instead of alert
+          setSnackbarSeverity('error');
+      } finally {
+        setLoadingFavorites(false); // End loading
+        setSnackbarOpen(true); // Open snackbar
     }
   } else {
-    alert('User not logged in or no movie selected.');
+    setSnackbarMessage('User not logged in or no movie selected.'); // Use Snackbar instead of alert
+    setSnackbarOpen(true); // Open snackbar
+
   }
 };
 
 const handleAddToWatchlist = async () => {
-    const email = localStorage.getItem("email");
-    if (selectedMovie && email) {
-        try {
-            if (isInWatchlist) {
-                // Remove from watchlist if already added
-                await removeFromWatchlistService(email, selectedMovie.id);
-                setIsInWatchlist(false); // Update state
-                alert('Removed from watchlist!');
-            } else {
-                // Add to watchlist
-                await addToWatchlistService(email, selectedMovie.id);
-                setIsInWatchlist(true); // Update state
-                alert('Added to Watchlist!');
-            }
-        } catch (error) {
-            console.error('Error updating watchlist:', error);
-            alert(`Failed to ${isInWatchlist ? 'remove from' : 'add to'} watchlist`);
-        }
-    } else {
-        alert('User not logged in or no movie selected.');
-    }
+  const email = localStorage.getItem("email");
+  if (selectedMovie && email) {
+    setLoadingWatchlist(true); // Start loading
+      try {
+          if (isInWatchlist) {
+              // Remove from watchlist if already added
+              await removeFromWatchlistService(email, selectedMovie.id);
+              setIsInWatchlist(false); // Update state
+              setSnackbarMessage('Removed from watchlist!'); // Use Snackbar instead of alert
+              setSnackbarSeverity('success');
+          } else {
+              // Add to watchlist
+              await addToWatchlistService(email, selectedMovie.id);
+              setIsInWatchlist(true); // Update state
+              setSnackbarMessage('Added to watchlist!'); // Use Snackbar instead of alert
+              setSnackbarSeverity('success');
+          }
+      } catch (error) {
+          console.error('Error updating watchlist:', error);
+          setSnackbarMessage(`Failed to ${isInWatchlist ? 'remove from' : 'add to'} watchlist`); // Use Snackbar instead of alert
+          setSnackbarSeverity('error');
+
+      } finally {
+          setLoadingWatchlist(false); // End loading
+          setSnackbarOpen(true); // Open snackbar
+      }
+  } else {
+    setSnackbarMessage('User not logged in or no movie selected.'); // Use Snackbar instead of alert
+    setSnackbarOpen(true); // Open snackbar
+
+  }
 };
+
 
   const handleCloseModal = () => {
     setIsModalOpen(false); // Close the modal
@@ -222,15 +302,17 @@ const handleAddToWatchlist = async () => {
   return (
     <>
       {isModalOpen && (
-            <Modal open={Boolean(selectedMovie)} onClose={handleCloseModal}>
-              <Box height={"95%"} overflow={"scroll"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'80%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
+            <Modal open={Boolean(selectedMovie)} onClose={onClose}>
+              <Box ref={modalContentRef} height={"80%"} overflow={"scroll"} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: {xs:"97%", sm:"90%", md:'80%', lg:"70%"}, bgcolor: 'background.paper', boxShadow: 24, borderRadius: '10px' }}>
                 <IconButton
-                  onClick={handleCloseModal}
+                  onClick={onClose}
                   sx={{
-                    position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    color: 'text.secondary'
+                    position: 'sticky',
+                    top: 5,           // Stick the button to the top of the scrolling area
+                    left: 5,
+                    color: 'text.secondary',
+                    zIndex: 999,
+                    bgcolor: 'white', // Add background color if needed for visibility
                   }}
                 >
                   <CloseIcon />
@@ -244,7 +326,7 @@ const handleAddToWatchlist = async () => {
                       </Typography>
                     </Grid>
                     <Grid mb={{xs:"0px", md:"20px"}} item xs={11.5} md={6} textAlign={"center"} sx={{ background: {xs:'linear-gradient(to right, #ff923c12, #ff923c42)', md:'linear-gradient(to right, transparent, #ff923c12)'}}}>
-                      <Box height={{xs:"500px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'}>
+                      <Box height={{xs:"490px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'}>
                         <Box
                           component="img"
                           src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
@@ -288,35 +370,40 @@ const handleAddToWatchlist = async () => {
                         <strong>Tagline:</strong> {movieDetails.tagline || 'N/A'}
                       </Typography>
                       <Grid container mt={3} gap={1}>
-                        <Button onClick={handleAddToFavorites}>
-                          {isFavorite ? (
-                            <FavoriteIcon style={{ color:'red', fontSize:"36px" }} />
+                      <Button onClick={handleAddToFavorites} disabled={loadingFavorites}>
+                          {loadingFavorites ? (
+                              <CircularProgress size={24} /> // Loading indicator
+                          ) : isFavorite ? (
+                              <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
                           ) : (
-                            <FavoriteBorderOutlinedIcon style={{ color:'red', fontSize:"36px" }} />
+                              <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
                           )}
-                        </Button>
-                        <Button onClick={handleAddToWatchlist}>
-                          {isInWatchlist ? (
-                              <WatchLaterIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
-                            ) : (
-                              <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
-                            )}                  
-                        </Button>
+                      </Button>
+                      <Button onClick={handleAddToWatchlist} disabled={loadingWatchlist}>
+                          {loadingWatchlist ? (
+                              <CircularProgress size={24} /> // Loading indicator
+                          ) : isInWatchlist ? (
+                              <WatchLaterIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                          ) : (
+                              <WatchLaterOutlinedIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                          )}
+                      </Button>
+
                         <div>
-                  <Button onClick={handleAddToListClick}>
+                  {/* <Button onClick={handleAddToListClick}>
                       Add to a List
-                  </Button>
+                  </Button> */}
           
-                  <Dialog open={open} onClose={handleClose}>
-                      <DialogTitle>Create a New List</DialogTitle>
-                      <DialogContent>
-                          <CreateList selectedMovie={selectedMovie}  onClose={handleClose} />
-                      </DialogContent>
-                      <DialogActions>
-                          <Button onClick={handleClose}>Cancel</Button>
-                      </DialogActions>
-                  </Dialog>
-              </div>
+                          <Dialog open={open} onClose={handleClose}>
+                              <DialogTitle>Create a New List</DialogTitle>
+                              <DialogContent>
+                                  <CreateList selectedMovie={selectedMovie}  onClose={handleClose} />
+                              </DialogContent>
+                              <DialogActions>
+                                  <Button onClick={handleClose}>Cancel</Button>
+                              </DialogActions>
+                          </Dialog>
+                      </div>
                       </Grid>
                     </Grid>
                     )}
@@ -330,7 +417,7 @@ const handleAddToWatchlist = async () => {
                         {loadingSimilar ? (
                           <CircularProgress />
                         ) : (
-                          <Grid container spacing={2} ml={-1} justifyContent={'center'}>
+                          <Grid container spacing={2} justifyContent={'center'}>
                             {similarMovies.map((movie) => (
                               <Grid item xs={3.8} md={5.8} key={movie.id} onClick={() => handleSimilarMovieClick(movie)}>
                                 <img
@@ -389,6 +476,16 @@ const handleAddToWatchlist = async () => {
               </Box>
             </Modal>
       )}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000} // Duration to show the Snackbar
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
     </>
   );
 };
