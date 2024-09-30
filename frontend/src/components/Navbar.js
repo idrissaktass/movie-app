@@ -95,10 +95,12 @@ const Navbar = () => {
   };
   const handleHome = () => {
     navigate("/");
+    setAnchorEl(null);
   }
   const handleFavoritesOpen = async () => {
     if (!isAuthenticated) {
       navigate("/login");
+      setAnchorEl(null);
       return;
     }
     try {
@@ -106,6 +108,7 @@ const Navbar = () => {
       const fetchedFavorites = await fetchFavoritesService(email);
       setFavorites(fetchedFavorites);
       setShowFavorites(true);
+      setAnchorEl(null);
     } catch (error) {
       console.error("Failed to fetch favorites:", error);
     }
@@ -114,6 +117,7 @@ const Navbar = () => {
   const handleWatchlistOpen = async () => {
     if (!isAuthenticated) {
       navigate("/login");
+      setAnchorEl(null);
       return;
     }
     try {
@@ -121,6 +125,7 @@ const Navbar = () => {
       const fetchedWatchlist = await fetchWatchlistService(email);
       setWatchlist(fetchedWatchlist);
       setShowWatchlist(true);
+      setAnchorEl(null);
     } catch (error) {
       console.error("Failed to fetch watchlist:", error);
     }
@@ -159,6 +164,7 @@ const Navbar = () => {
 
   const handleSearchOptions = () => {
     navigate("/search-results");
+    setAnchorEl(null);
   };
 
   return (
