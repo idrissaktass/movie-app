@@ -53,7 +53,7 @@ const SearchResults = ({ onClose, SearchResults  }) => {
   const handleOpenModal = (movie) => {
     setSelectedMovie(movie);
     setIsMovieModalOpen(true); // Open the MovieModal
-    console.log("movie",movie)
+    console.log("Opened modal for movie:", movie); // Debugging log
   };
   const refreshSearch = async () => {
     fetchMovies()
@@ -61,7 +61,8 @@ const SearchResults = ({ onClose, SearchResults  }) => {
   const handleCloseModal = () => {
     setIsMovieModalOpen(false);
     setSelectedMovie(null); // Clear the selected movie
-    refreshSearch()
+    console.log("Closed modal"); // Debugging log
+
   };
 
   useEffect(() => {
