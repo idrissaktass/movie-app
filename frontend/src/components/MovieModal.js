@@ -317,30 +317,37 @@ const handleAddToWatchlist = async () => {
                 >
                   <CloseIcon />
                 </IconButton>
-                {selectedMovie && (
+                {movieDetails && (
+                  loadingInfo ? (
+                    <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    height="100%" // or any specific height you need
+                  >
+                    <CircularProgress size={60} /> {/* Adjust the size as needed */}
+                  </Box>
+                  ) : (
                   <Grid container paddingInline={{xs:"10px", lg:"40px"}} paddingBlock={{xs:"20px", lg:"40px"}} justifyContent={'center'}>
                     {/* Movie details section */}
                     <Grid xs={12} textAlign={"center"} mb={2}>
                       <Typography variant="h5" component="h2">
-                        {selectedMovie.title} ({selectedMovie.release_date?.split('-')[0]})
+                        {movieDetails.title} ({movieDetails.release_date?.split('-')[0]})
                       </Typography>
                     </Grid>
                     <Grid mb={{xs:"0px", md:"20px"}} item xs={11.5} md={6} textAlign={"center"} sx={{ background: {xs:'linear-gradient(to right, #ff923c12, #ff923c42)', md:'linear-gradient(to right, transparent, #ff923c12)'}}}>
                       <Box height={{xs:"490px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'}>
                         <Box
                           component="img"
-                          src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
-                          alt={selectedMovie.title}
+                          src={`https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`}
+                          alt={movieDetails.title}
                           sx={{ width: {xs:"100%", md:"85%", lg:"80%", xl:"70%"}, position: 'relative', alignSelf:"center" }}
                         />
                       </Box>
                     </Grid>
-                    {loadingInfo ? (
-                        <CircularProgress />
-                    ) : (
                       <Grid mb={{xs:"15px", md:"20px"}} item xs={11.5} md={6} pr={{xs:"10px", md:"20px"}} paddingBlock={{xs:"10px", md:"unset"}} paddingLeft={{xs:"10px", md:"0px"}} sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)'}}>
                       <Typography variant="body2" mt={2}>
-                        {selectedMovie.overview}
+                        {movieDetails.overview}
                       </Typography>
                       <Typography variant="body1" mt={2}>
                         <strong>Score:</strong> {Math.round(movieDetails.vote_average * 10) / 10}/10
@@ -406,7 +413,6 @@ const handleAddToWatchlist = async () => {
                       </div>
                       </Grid>
                     </Grid>
-                    )}
                     {/* Reviews section */}
                     <Grid container justifyContent="center" xs={12}>
                       {/* Similar Movies section */}
@@ -472,6 +478,7 @@ const handleAddToWatchlist = async () => {
                       </Grid>
                     </Grid>
                   </Grid>
+                )
                 )}
               </Box>
             </Modal>
