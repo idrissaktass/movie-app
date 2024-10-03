@@ -20,3 +20,7 @@ A web application to search for movies by genre, year, or mood (happy, sad, etc.
 * Node.js
 * Express.js
 * MongoDB
+
+### API:
+
+* TMDB API
