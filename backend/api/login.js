@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import Cors from 'cors';
 
 const cors = Cors({
-  origin: 'https://movie-app-frontend-xi.vercel.app',
+  origin: 'https://movie-app-x.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
