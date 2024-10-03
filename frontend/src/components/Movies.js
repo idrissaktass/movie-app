@@ -56,6 +56,7 @@ const moodsGenresMapping = {
   humorous: [35, 10402], // Comedy, Music
   uplifting: [35, 12, 10751], // Comedy, Adventure, Family
   tense: [53, 9648], // Thriller, Mystery
+  curious: [878, 99], // Sci-Fi, Documentary
   rebellious: [28, 80], // Action, Crime
 };
 
@@ -1088,9 +1089,9 @@ const handleAddToWatchlist = async (movieId) => {
                   )}
                 </Button>
                   <div>
-            <Button onClick={handleAddToListClick}>
+            {/* <Button onClick={handleAddToListClick}>
                 Add to a List
-            </Button>
+            </Button> */}
 
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Create a New List</DialogTitle>
@@ -1370,9 +1371,9 @@ const handleAddToWatchlist = async (movieId) => {
                                   )}                  
                               </Button>
                             <div>
-                                <Button onClick={handleAddToListClick}>
+                                {/* <Button onClick={handleAddToListClick}>
                                     Add to a List
-                                </Button>
+                                </Button> */}
 
                                 <Dialog open={open} onClose={handleClose}>
                                     <DialogTitle>Create a New List</DialogTitle>
