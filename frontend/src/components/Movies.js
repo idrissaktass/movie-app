@@ -177,6 +177,7 @@ const handleAddToFavorites = async (movieId) => {
       } finally {
           setLoadingFavorites(false)
           setSnackbarOpen(true); // Open snackbar
+          setLoadingFavorites(false)
       }
   } else {
       setSnackbarMessage('User not logged in.');
@@ -222,7 +223,15 @@ const handleAddToWatchlist = async (movieId) => {
 };
 
   const handleMoodChange = (event) => {
-    setSelectedMood(event.target.value);
+    const value = event.target.value;
+
+    // If the clicked checkbox is already selected, uncheck it
+    if (value === selectedMood) {
+      setSelectedMood(null);
+    } else {
+      // Set the selected mood
+      setSelectedMood(value);
+    }
   };
 
   const handleMoodChangeMobile = (event) => {
@@ -837,63 +846,20 @@ const handleAddToWatchlist = async (movieId) => {
                     </Select>
                   </FormControl>
             ) : (
-              <Box textAlign={'center'}>
-                  <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="happy" />}
-                  label="Happy"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="sad" />}
-                  label="Sad"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="excited" />}
-                  label="Excited"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="relaxed" />}
-                  label="Relaxed"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="adventurous" />}
-                  label="Adventurous"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="scared" />}
-                  label="Scared"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="romantic" />}
-                  label="Romantic"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="romanticcomedy" />}
-                  label="Romantic Comedy"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="thoughtful" />}
-                  label="Thoughtful"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="humorous" />}
-                  label="Humorous"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="uplifting" />}
-                  label="Uplifting"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="tense" />}
-                  label="Tense"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="curious" />}
-                  label="Curious"
-                />
-                <FormControlLabel
-                  control={<Checkbox onChange={handleMoodChange} value="rebellious" />}
-                  label="Rebellious"
-                />
+              <Box textAlign={'center'} paddingInline={3}>
+                {moods.map((mood) => (
+                  <FormControlLabel sx={{backgroundColor:"#ff923c42", marginBottom:"5px", paddingRight:"8px", borderRadius:"10px"}}
+                    key={mood.value}
+                    control={
+                      <Checkbox
+                        checked={selectedMood === mood.value}
+                        onChange={handleMoodChange}
+                        value={mood.value}
+                      />
+                    }
+                    label={mood.label}
+                  />
+                ))}
               </Box>
             )}      
             <Button sx={{width:{xs:"90%", md:"50%"}, backgroundColor:"#934c14"}} variant="contained" onClick={handleSubmit} disabled={!selectedMood}>
@@ -1103,20 +1069,25 @@ const handleAddToWatchlist = async (movieId) => {
                   <strong>Tagline:</strong> {movieDetails.tagline || 'N/A'}
                 </Typography>
                 <Grid container mt={3} gap={1}>
-                  <Button onClick={() => handleAddToFavorites(selectedMovie.id)}>
-                  {isFavorite ? (
-                      <FavoriteIcon style={{ color:'red', fontSize:"36px" }} />
-                    ) : (
-                      <FavoriteBorderOutlinedIcon style={{ color:'red', fontSize:"36px" }} />
-                    )}
-                  </Button>
-                  <Button onClick={() => {handleAddToWatchlist(selectedMovie.id);}}>
-                    {isInWatchlist ? (
-                        <WatchLaterIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
-                      ) : (
-                        <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
-                      )}                  
-                  </Button>
+                <Button onClick={() => handleAddToFavorites(selectedMovie.id)} disabled={loadingFavorites}>
+                  {loadingFavorites ? (
+                    <CircularProgress size={24} style={{ color: 'red' }} />
+                  ) : isFavorite ? (
+                    <FavoriteIcon style={{ color:'red', fontSize: "36px" }} />
+                  ) : (
+                    <FavoriteBorderOutlinedIcon style={{ color:'red', fontSize: "36px" }} />
+                  )}
+                </Button>
+                
+                <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} disabled={loadingWatchlist}>
+                  {loadingWatchlist ? (
+                    <CircularProgress size={24} style={{ color: '#ff7b2e' }} />
+                  ) : isInWatchlist ? (
+                    <WatchLaterIcon style={{ color:'#ff7b2e', fontSize: "36px" }} />
+                  ) : (
+                    <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize: "36px" }} />
+                  )}
+                </Button>
                   <div>
             <Button onClick={handleAddToListClick}>
                 Add to a List
@@ -1224,7 +1195,7 @@ const handleAddToWatchlist = async (movieId) => {
           >
             <CloseIcon />
           </IconButton>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom textAlign={'center'}>
               Pick Genres (Select up to 3)
             </Typography>  
             <Grid display={'flex'} flexDirection={'column'} alignItems={'center'} gap={1}>
@@ -1271,9 +1242,9 @@ const handleAddToWatchlist = async (movieId) => {
       </FormControl>
 
       ) : (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: "center" }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: "center" }} paddingInline={3} textAlign={"center"}>
           {genresList.map((genre) => (
-            <FormControlLabel
+            <FormControlLabel sx={{backgroundColor:"#ff923c42", marginBottom:"5px", paddingRight:"8px", borderRadius:"10px"}}
               key={genre.id}
               control={
                 <Checkbox
@@ -1379,17 +1350,21 @@ const handleAddToWatchlist = async (movieId) => {
                                 setSelectedMovie(movie); // Set the selected movie
                                 handleAddToFavorites(movie.id); // Pass movie.id to the function
                             }}>
-                                {favoriteMovies[movie.id] ? (
-                                    <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
+                                {loadingFavorites ? (
+                                  <CircularProgress size={24} style={{ color: 'red' }} />
+                                ) : favoriteMovies[movie.id] ? (
+                                  <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
                                 ) : (
-                                    <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
+                                  <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
                                 )}
                             </Button>
                               <Button onClick={() => {
                                   setSelectedMovie(movie); // Set the selected movie
                                   handleAddToWatchlist(movie.id); // Pass movie.id to the function
                               }}>
-                                {watchlistMovies[movie.id] ? (
+                                {loadingWatchlist ? (
+                                    <CircularProgress size={24} style={{ color: 'red' }} />
+                                  ) : watchlistMovies[movie.id] ? (
                                     <WatchLaterIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
                                   ) : (
                                     <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
