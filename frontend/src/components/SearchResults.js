@@ -226,7 +226,7 @@ const SearchResults = ({ onClose, SearchResults  }) => {
             <Grid container gap={1} justifyContent={'center'} mt={2}>
               {movies.map((movie) => (
                 <Grid item xs={5} sm={2.8} md={2} lg={2} key={movie.id}>
-                  <Box position="relative" onClick={() => handleOpenModal(movie)}>
+                  <Box position="relative" onClick={() => handleOpenModal(movie)} sx={{cursor:"pointer"}}>
                     <img
                       src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                       alt={movie.title}
