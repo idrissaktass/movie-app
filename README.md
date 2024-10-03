@@ -1,4 +1,4 @@
-### Movie Search App
+## Movie Search App
 A web application to search for movies by genre, year, or mood (happy, sad, etc.) and get suggestions based on user preferences.
 
 ### Features
@@ -8,14 +8,14 @@ Get movie recommendations based on your mood (happy, sad, etc.).
 Display movie details such as title, year, rating, and reviews.
 Responsive and user-friendly UI built with Material UI.
 
-### Technologies Used
-## Frontend:
+## Technologies Used
+### Frontend:
 
 React
 Material UI
 Axios (for making API requests)
 
-## Backend:
+### Backend:
 
 Node.js
 Express.js
