@@ -45,22 +45,31 @@ const MovieModal = ({ selectedMovie, onOpen, onClose  }) => {
   console.log("1234")
   useEffect(() => {
     const checkUserLists = async () => {
-    if (selectedMovie) {
+      const email = localStorage.getItem("email");
+  
+  
       setLoadingInfo(true);
       setLoadingReviews(true);
       setMovieDetails(null);
       setReviews([]);
-      const email = localStorage.getItem("email");
+
+      fetchMovieInfo(selectedMovie);
+      fetchSimilarMovies(selectedMovie);
+      setIsModalOpen(true);
+      console.log("selected", selectedMovie);
+      if (!email || !selectedMovie) return;
+  
       const favorites = await fetchFavoritesService(email);
       const watchlist = await fetchWatchlistService(email);
       const movieId = Number(selectedMovie.id);
-      fetchMovieInfo(selectedMovie);
-      fetchSimilarMovies(selectedMovie);
-      setIsModalOpen(true)
-      console.log("selected",selectedMovie)
-      setIsFavorite(favorites.includes(selectedMovie.id.toString()));
-      setIsInWatchlist(watchlist.includes(movieId));
-    }}; checkUserLists();
+  
+      setIsFavorite(favorites?.includes(selectedMovie.id.toString()));
+      setIsInWatchlist(watchlist?.includes(movieId));
+    };
+  
+    if (selectedMovie) {
+      checkUserLists();
+    }
   }, [selectedMovie]);
   // const smoothScrollTo = (target) => {
   //   const scrollContainer = target;
