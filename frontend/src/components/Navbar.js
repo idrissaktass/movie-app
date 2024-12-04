@@ -178,7 +178,7 @@ const Navbar = () => {
             sx={{ cursor: "pointer" }}
             onClick={() => navigate("/")}
           >
-            MovieHub
+            CineScope
           </Typography>
         </Grid>
         <Box sx={{ display: { xs: "none", md: "flex" }, ml: 2 }}>
