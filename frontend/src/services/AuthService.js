@@ -1,5 +1,5 @@
 //movie-app/frontend/src/services/authservice.js
-const BASE_URL = 'https://movie-app-backend-ruddy.vercel.app/api'; // Adjusted base URL
+const BASE_URL = 'https://movie-app-backend-liard.vercel.app/api'; // Adjusted base URL
 
 export const loginService = async (email, password) => {
   const response = await fetch(`${BASE_URL}/login`, {
