@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import Cors from 'cors';
 
 const cors = Cors({
-  origin: 'https://movie-app-x.vercel.app',
+  origin: 'https://www.cinescope.online',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
   // Handle preflight requests for CORS
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', 'https://movie-app-frontend-xi.vercel.app');
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.cinescope.online');
     res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return res.status(204).end(); // No content for OPTIONS method
