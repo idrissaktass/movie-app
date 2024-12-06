@@ -11,14 +11,14 @@ import { useTheme } from "@mui/material/styles";
 import randomPic from "../images/random.png"
 import moodsPic from "../images/moods.png"
 import axios from 'axios';
-import CloseIcon from '@mui/icons-material/Close'; // Import the Close icon
+import CloseIcon from '@mui/icons-material/Close';
 import { AuthContext } from '../context/AuthContext';
 import { addFavoriteService, addToWatchlistService, removeFavoriteService, removeFromWatchlistService, fetchFavoritesService,fetchWatchlistService } from "../services/AuthService";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
-import CreateList from './CreateList'; // Adjust the import based on your file structure
+import CreateList from './CreateList';
 
 const genresList = [
   { id: 28, name: 'Action' },
@@ -60,7 +60,7 @@ const moodsGenresMapping = {
   rebellious: [28, 80], // Action, Crime
 };
 
-const apiKey = '404bc2a47139c3a5d826814f03794b21'; // TMDB API key
+const apiKey = '404bc2a47139c3a5d826814f03794b21';
 
 function Movies() {
   const [movieData, setMovieData] = useState(null);
@@ -75,8 +75,8 @@ function Movies() {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const isBiggerScreen = useMediaQuery((theme) => theme.breakpoints.up("xl"));
-  const [selectedMovie, setSelectedMovie] = useState(null); // For storing the selected movie
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal open state
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [similarMovies, setSimilarMovies] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loadingSimilar, setLoadingSimilar] = useState(true);
@@ -90,22 +90,22 @@ function Movies() {
   const [movie, setMovie] = useState(null);
   const [isRandomMovie, setIsRandomMovie] = useState(false);
   const [movies, setMovies] = useState([]);
-  const [moviesDetails, setMoviesDetails] = useState([]); // Ensure this is an array
+  const [moviesDetails, setMoviesDetails] = useState([]);
   const [selectedMood, setSelectedMood] = useState('');
   const [moodMovies, setMoodMovies] = useState([]);
   const [isMoodMovie, setIsMoodMovie] = useState(false);
   const {  addToWatchlist } = useContext(AuthContext);
-  const { user } = useContext(AuthContext); // Assuming the user context provides the current user info
+  const { user } = useContext(AuthContext);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [open, setOpen] = useState(false);
-  const [favoriteMovies, setFavoriteMovies] = useState({}); // To track favorites for each movie
-  const [watchlistMovies, setWatchlistMovies] = useState({}); // To track favorites for each movie
+  const [favoriteMovies, setFavoriteMovies] = useState({});
+  const [watchlistMovies, setWatchlistMovies] = useState({});
   const [loadingFavorites, setLoadingFavorites] = useState(false);
   const [loadingWatchlist, setLoadingWatchlist] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [selectedGenreNames, setSelectedGenreNames] = useState([]);
 
   const handleAddToListClick = () => {
@@ -119,7 +119,7 @@ function Movies() {
   };
 
   const handleClose = () => {
-      setOpen(false); // Close the dialog
+      setOpen(false);
   };
 
   useEffect(() => {
@@ -130,14 +130,11 @@ function Movies() {
                 const favorites = await fetchFavoritesService(email);
                 const watchlist = await fetchWatchlistService(email);
 
-                // Log the results to verify they are correct
                 console.log("Favorites:", favorites);
                 console.log("Watchlist:", watchlist);
 
-                // Convert selectedMovie.id to a number for comparison
                 const movieId = Number(selectedMovie.id);
 
-                // Check if the selected movie is in favorites or watchlist
                 setIsFavorite(favorites.includes(selectedMovie.id.toString()));
                 setIsInWatchlist(watchlist.includes(movieId));
             } catch (error) {
@@ -147,7 +144,7 @@ function Movies() {
     };
 
     checkUserLists();
-}, [selectedMovie]); // Run effect whenever selectedMovie changes
+}, [selectedMovie]);
 
 
 const handleAddToFavorites = async (movieId) => {
@@ -156,16 +153,14 @@ const handleAddToFavorites = async (movieId) => {
     setLoadingFavorites(true)
       try {
           if (favoriteMovies[movieId]) {
-              // Remove from favorites if already added
               await removeFavoriteService(email, movieId);
-              setFavoriteMovies((prev) => ({ ...prev, [movieId]: false })); // Update state
+              setFavoriteMovies((prev) => ({ ...prev, [movieId]: false }));
               setIsFavorite(false);
               setSnackbarMessage('Removed from favorites!');
               setSnackbarSeverity('success');
           } else {
-              // Add to favorites
               await addFavoriteService(email, movieId);
-              setFavoriteMovies((prev) => ({ ...prev, [movieId]: true })); // Update state
+              setFavoriteMovies((prev) => ({ ...prev, [movieId]: true }));
               setIsFavorite(true);
               setSnackbarMessage('Added to favorites!');
               setSnackbarSeverity('success');
@@ -182,7 +177,7 @@ const handleAddToFavorites = async (movieId) => {
   } else {
       setSnackbarMessage('User not logged in.');
       setSnackbarSeverity('error');
-      setSnackbarOpen(true); // Open snackbar
+      setSnackbarOpen(true);
   }
 };
 
@@ -192,16 +187,14 @@ const handleAddToWatchlist = async (movieId) => {
     setLoadingWatchlist(true)
       try {
           if (watchlistMovies[movieId]) {
-              // Remove from watchlist if already added
               await removeFromWatchlistService(email, movieId);
-              setWatchlistMovies((prev) => ({ ...prev, [movieId]: false })); // Update state
+              setWatchlistMovies((prev) => ({ ...prev, [movieId]: false }));
               setSnackbarMessage('Removed from watchlist!');
               setIsInWatchlist(false);
               setSnackbarSeverity('success');
           } else {
-              // Add to watchlist
               await addToWatchlistService(email, movieId);
-              setWatchlistMovies((prev) => ({ ...prev, [movieId]: true })); // Update state
+              setWatchlistMovies((prev) => ({ ...prev, [movieId]: true }));
               setSnackbarMessage('Added to Watchlist!');
               setSnackbarSeverity('success');
               setIsInWatchlist(true);
@@ -218,18 +211,16 @@ const handleAddToWatchlist = async (movieId) => {
   } else {
       setSnackbarMessage('User not logged in or no movie selected.');
       setSnackbarSeverity('error');
-      setSnackbarOpen(true); // Open snackbar
+      setSnackbarOpen(true);
   }
 };
 
   const handleMoodChange = (event) => {
     const value = event.target.value;
 
-    // If the clicked checkbox is already selected, uncheck it
     if (value === selectedMood) {
       setSelectedMood(null);
     } else {
-      // Set the selected mood
       setSelectedMood(value);
     }
   };
@@ -239,10 +230,8 @@ const handleAddToWatchlist = async (movieId) => {
       target: { value },
     } = event;
 
-    // Convert the value to an array if it is not
     const valueArray = typeof value === 'string' ? value.split(',') : value;
 
-    // Update selectedMood state
     setSelectedMood(valueArray);
   };
 
@@ -258,16 +247,15 @@ const handleAddToWatchlist = async (movieId) => {
     return combinations;
   };  
   const fetchMovies = async () => {
-    setLoading(true); // Show loading spinner
+    setLoading(true);
     const genreIds = moodsGenresMapping[selectedMood];
     console.log("genreIds", genreIds);
   
     const combinations = getGenreCombinations(genreIds);
     const allMovies = [];
   
-    // Fetch movies for each combination
     for (const combination of combinations) {
-      for (let page = 1; page <= 5; page++) { // Fetch 5 pages for each combination
+      for (let page = 1; page <= 5; page++) {
         const url = `https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${combination}&page=${page}`;
         const options = {
           method: 'GET',
@@ -281,34 +269,31 @@ const handleAddToWatchlist = async (movieId) => {
           const response = await fetch(url, options);
           const data = await response.json();
           
-          // Filter movies based on vote count and average score
           const filteredMovies = data.results.filter(movie => 
             movie.vote_count >= 300 && movie.vote_average >= 6.0
           );
-          allMovies.push(...filteredMovies); // Collect movies from all combinations and pages
+          allMovies.push(...filteredMovies);
         } catch (error) {
           console.error(`Error fetching movies for page ${page} of combination ${combination}:`, error);
         }
       }
     }
     console.log("123",allMovies)
-    // Shuffle and pick unique movies
     const uniqueMovies = Array.from(new Set(allMovies.map(movie => movie.id))) // Ensure uniqueness by ID
       .map(id => allMovies.find(movie => movie.id === id));
   
     const randomMovies = uniqueMovies
-      ?.sort(() => Math.random() - 0.5) // Shuffle movies
+      ?.sort(() => Math.random() - 0.5)
       .slice(0, 3); // Pick 3 movies
   
-    setMoodMovies(randomMovies); // Set the state with random movies
+    setMoodMovies(randomMovies);
     
     if (randomMovies?.length > 0) {
-      setMoviesDetails([]); // Reset previous movie details
-      // Fetch details for each random movie
+      setMoviesDetails([]);
       await Promise.all(randomMovies.map((movie) => fetchMovieInfo(movie)));
     }
   
-    setLoading(false); // Hide loading spinner
+    setLoading(false);
   };
   
   
@@ -317,16 +302,14 @@ const handleAddToWatchlist = async (movieId) => {
   };
 
   const fetchRandomMovie = async () => {
-    if (selectedGenres.length === 0) return; // Ensure at least one genre is selected
+    if (selectedGenres.length === 0) return;
   
     let genreIds;
   
     if (selectedGenres.length === 3) {
-      // Shuffle the selected genres and take the first 2
       const shuffledGenres = selectedGenres.sort(() => 0.5 - Math.random());
-      genreIds = shuffledGenres.slice(0, 2).join(','); // Combine the first two shuffled genres
+      genreIds = shuffledGenres.slice(0, 2).join(',');
     } else {
-      // If 2 or 1 genre selected, just use the selected genres
       genreIds = selectedGenres.join(',');
     }
   
@@ -340,13 +323,12 @@ const handleAddToWatchlist = async (movieId) => {
       }
     };
   
-    setMovies([]); // Clear previous movies
-    setLoading(true); // Show loading spinner
+    setMovies([]); 
+    setLoading(true);
   
     try {
       let allMovies = [];
   
-      // Fetch 5 pages of movie results
       for (let page = 1; page <= 8; page++) {
         const response = await fetch(`${baseUrl}&page=${page}`, options);
         const data = await response.json();
@@ -356,27 +338,24 @@ const handleAddToWatchlist = async (movieId) => {
   
       console.log("All fetched movies:", allMovies);
   
-      // Filter movies based on vote count and average score
       const filteredMovies = allMovies.filter(
         movie => movie.vote_count >= 300 && movie.vote_average >= 6.0
       );
   
-      // Shuffle and pick 3 random movies
       const randomMovies = filteredMovies
-        .sort(() => Math.random() - 0.5) // Shuffle movies
+        .sort(() => Math.random() - 0.5)
         .slice(0, 3); // Pick 3 movies
   
-      setMovies(randomMovies); // Update state with random movies
+      setMovies(randomMovies);
   
       if (randomMovies.length > 0) {
-        setMoviesDetails([]); // Reset previous movie details
-        // Fetch details for each random movie
+        setMoviesDetails([]); 
         await Promise.all(randomMovies.map(movie => fetchMovieInfo(movie)));
       }
     } catch (error) {
       console.error('Error fetching movies:', error);
     } finally {
-      setLoading(false); // Hide loading spinner
+      setLoading(false);
     }
   };
   
@@ -386,12 +365,12 @@ const handleAddToWatchlist = async (movieId) => {
     
     setSelectedGenres((prevGenres) => {
       if (prevGenres.includes(genreId)) {
-        return prevGenres.filter((id) => id !== genreId); // Remove genre if already selected
+        return prevGenres.filter((id) => id !== genreId);
       }
       if (prevGenres?.length < 3) {
-        return [...prevGenres, genreId]; // Allow adding up to 3 genres
+        return [...prevGenres, genreId];
       }
-      return prevGenres; // If 3 genres are selected, do nothing
+      return prevGenres;
     });
   };
 
@@ -400,33 +379,29 @@ const handleAddToWatchlist = async (movieId) => {
         target: { value },
     } = event;
 
-    // Convert value to an array if it's not already
     const valueArray = typeof value === 'string' ? value.split(',') : value;
     setSelectedGenres((prevSelected) => {
       const newSelected = valueArray.map((id) => parseInt(id, 10));
-      // Allow updating only if the new selection does not exceed 3 genres
       if (newSelected.length <= 3) {
         return newSelected;
       }
-      return prevSelected; // Do not update if it exceeds 3
+      return prevSelected;
     });
 
     setSelectedGenreNames((prevSelected) => {
         const newSelected = valueArray.map((id) => parseInt(id, 10));
         
-        // Allow updating only if the new selection does not exceed 3 genres
         if (newSelected.length <= 4) {
-            // Find the corresponding genre names
             const selectedGenreNames = newSelected.map((id) => {
                 const genre = genresList.find((genre) => genre.id === id);
-                return genre ? genre.name : null; // Return the genre name or null if not found
-            }).filter(name => name !== null); // Filter out any null values
+                return genre ? genre.name : null;
+            }).filter(name => name !== null);
             
-            console.log("Selected Genre Names:", selectedGenreNames); // Log the selected genre names
-            return newSelected; // Return newSelected for IDs; if you need names, return selectedGenreNames instead
+            console.log("Selected Genre Names:", selectedGenreNames);
+            return newSelected;
         }
         
-        return prevSelected; // Do not update if it exceeds 3
+        return prevSelected;
     });
 };
     console.log("selected genres", selectedGenres, genresList);
@@ -439,8 +414,8 @@ const handleAddToWatchlist = async (movieId) => {
 
   useEffect(() => {
     const fetchTopMovies = async () => {
-      const totalPages = 5; // Adjust the number of pages you want to fetch
-      const allMovies = []; // Array to store all movies
+      const totalPages = 5;
+      const allMovies = [];
   
       try {
         for (let page = 1; page <= totalPages; page++) {
@@ -451,14 +426,13 @@ const handleAddToWatchlist = async (movieId) => {
           console.log("data",data)
 
           if (data.results) {
-            allMovies.push(...data.results); // Add the movies from each page
+            allMovies.push(...data.results);
           } else {
             console.error('Error:', data.status_message);
-            break; // Exit loop if an error occurs in the API response
+            break;
           }
         }
   
-        // Shuffle the movies and pick 24 randomly for the carousel
         const randomMovies = allMovies.sort(() => 0.5 - Math.random()).slice(0, 24);
         setTopMovies(randomMovies);
   
@@ -473,9 +447,7 @@ const handleAddToWatchlist = async (movieId) => {
 
   useEffect(() => {
     if (selectedMovie) {
-      // Fetch similar movies based on genres
 
-      // Fetch movie reviews
       const fetchReviews = async () => {
         try {
           const response = await axios.get(`https://api.themoviedb.org/3/movie/${selectedMovie.id}/reviews?api_key=${apiKey}&language=en-US&page=1`);
@@ -493,17 +465,14 @@ const handleAddToWatchlist = async (movieId) => {
     try {
       const genreIds = movie.genre_ids;
   
-      // Determine the number of genres to use in the API request
       const genresToUse = genreIds?.length > 1 ? genreIds.slice(0, 2) : genreIds;
   
-      // Convert the selected genres to a comma-separated string
       const genreIdsString = genresToUse.join(',');
   
       console.log("Fetching similar movies with genre IDs:", genreIdsString);
   
       const allMovies = [];
   
-      // Fetch movies from pages 1, 2, and 3
       for (let page = 1; page <= 5; page++) {
         const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
           params: {
@@ -516,22 +485,17 @@ const handleAddToWatchlist = async (movieId) => {
           }
         });
   
-        // Exclude the selected movie from the similar movies list
         const filteredMovies = response.data.results.filter(m => m.id !== movie.id);
         
-        // Add the filtered movies from this page to the allMovies array
         allMovies.push(...filteredMovies);
       }
   
-      // Shuffle the collected movies
       const shuffledMovies = allMovies.sort(() => 0.5 - Math.random());
       
-      // Select a random number of movies (up to 6)
-      const randomMovies = shuffledMovies.slice(0, 6); // Take only the first 6 shuffled movies
+      const randomMovies = shuffledMovies.slice(0, 6);
   
       console.log("Randomly selected movies:", randomMovies);
   
-      // Set the state to the randomly selected movies
       setSimilarMovies(randomMovies);
     } catch (error) {
       console.error("Error fetching similar movies:", error);
@@ -570,22 +534,22 @@ const handleAddToWatchlist = async (movieId) => {
   };
   const scrollToModalTop = () => {
     if (modalContentRef.current) {
-      modalContentRef.current.scrollTop = 0; // Scroll to the top
+      modalContentRef.current.scrollTop = 0;
     }
   };
   useEffect(() => {
     if (isModalOpen) {
-      scrollToModalTop(); // Scroll to top when modal opens
+      scrollToModalTop();
     }
   }, [isModalOpen]);
   
   const handleMovieClick = (movie) => {
-    setSelectedMovie(movie); // Set the selected movie
+    setSelectedMovie(movie);
     console.log("Selected movie:", movie);
-    setIsModalOpen(true); // Open the modal
-    fetchMovieInfo(movie); // Fetch details of the selected movie
-    fetchSimilarMovies(movie); // Fetch similar movies for the selected movie
-    scrollToModalTop(); // Scroll to top of the modal
+    setIsModalOpen(true); 
+    fetchMovieInfo(movie); 
+    fetchSimilarMovies(movie); 
+    scrollToModalTop(); 
   };
   
   
@@ -596,15 +560,15 @@ const handleAddToWatchlist = async (movieId) => {
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false); // Close the modal
+    setIsModalOpen(false);
   };
 
   const handleCloseRandomModal = () => {
-    setIsRandomMovie(false); // Close the modal
+    setIsRandomMovie(false);
   };
 
   const handleCloseMoodModal = () => {
-    setIsMoodMovie(false); // Close the modal
+    setIsMoodMovie(false);
   };
 
   const moods = [
