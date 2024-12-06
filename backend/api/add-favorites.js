@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
   // Handle the OPTIONS method (preflight request)
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', 'https://https://www.cinescope.online');
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.cinescope.online');
     res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, PUT, PATCH, POST, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.status(204).end(); // No content for OPTIONS method
