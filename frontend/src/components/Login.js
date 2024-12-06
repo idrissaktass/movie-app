@@ -13,21 +13,21 @@ const Login = ({ setIsAuthenticated }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true when the login process starts
+    setLoading(true);
     try {
       const { token, user } = await loginService(email, password);
-      localStorage.setItem("token", token); // Store token in localStorage
+      localStorage.setItem("token", token);
       localStorage.setItem("email", email);
       console.log("user", user);
-      localStorage.setItem("username", user.username); // Store username in localStorage
-      setIsAuthenticated(true); // Update authentication state
+      localStorage.setItem("username", user.username);
+      setIsAuthenticated(true);
       setSnackbarMessage("Login successful!");
-      navigate("/"); // Redirect to homepage
+      navigate("/");
     } catch (error) {
       setSnackbarMessage("Login failed. Please check your credentials.");
       console.error("Login error:", error);
     } finally {
-      setLoading(false); // Set loading to false after the login process
+      setLoading(false);
       setOpenSnackbar(true);
     }
   };
@@ -41,7 +41,7 @@ const Login = ({ setIsAuthenticated }) => {
             padding: "2rem",
             borderRadius: "8px",
             boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-            position: "relative", // Set position relative to position CircularProgress
+            position: "relative", 
           }}
         >
           {loading && (
@@ -51,8 +51,8 @@ const Login = ({ setIsAuthenticated }) => {
                 position: "absolute",
                 top: "50%",
                 left: "50%",
-                transform: "translate(-50%, -50%)", // Center the loader
-                zIndex: 1, // Ensure it appears above other elements
+                transform: "translate(-50%, -50%)",
+                zIndex: 1,
               }}
             />
           )}
@@ -69,7 +69,7 @@ const Login = ({ setIsAuthenticated }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  disabled={loading} // Disable input fields while loading
+                  disabled={loading}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -81,7 +81,7 @@ const Login = ({ setIsAuthenticated }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  disabled={loading} // Disable input fields while loading
+                  disabled={loading}
                 />
               </Grid>
               <Grid item xs={12}>
