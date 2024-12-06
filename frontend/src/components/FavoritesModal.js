@@ -2,38 +2,37 @@ import React, { useEffect, useState } from "react";
 import { Modal, Box, Typography, Button, CircularProgress, Grid, Pagination, IconButton } from "@mui/material";
 import axios from "axios";
 import MovieModal from "./MovieModal";
-import CloseIcon from '@mui/icons-material/Close'; // Import the Close icon
+import CloseIcon from '@mui/icons-material/Close';
 
 const FavoritesModal = ({ onClose, favorites  }) => {
     const [moviesDetails, setMoviesDetails] = useState([]);
     const [loadingInfo, setLoadingInfo] = useState(true);
-    const [selectedMovie, setSelectedMovie] = useState(null); // State to hold the selected movie
-    const [isMovieModalOpen, setIsMovieModalOpen] = useState(false); // State to control MovieModal visibility
+    const [selectedMovie, setSelectedMovie] = useState(null);
+    const [isMovieModalOpen, setIsMovieModalOpen] = useState(false);
 
     const handleOpenModal = (movie) => {
         setSelectedMovie(movie);
-        setIsMovieModalOpen(true); // Open the MovieModal
+        setIsMovieModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsMovieModalOpen(false);
-        setSelectedMovie(null); // Clear the selected movie
+        setSelectedMovie(null);
     };
 
-    // Function to fetch movie details for each movie in the favorites
     const fetchMovieInfo = async (movieId) => {
         console.log("Fetching info for movie ID:", movieId);
         try {
             const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}?language=en-US`, {
                 headers: {
                     accept: 'application/json',
-                    Authorization: 'Bearer YOUR_API_KEY' // Replace with your API key
+                    Authorization: 'Bearer YOUR_API_KEY'
                 }
             });
-            return response.data; // Return the movie details
+            return response.data
         } catch (error) {
             console.error("Error fetching movie info:", error);
-            return null; // Return null if there's an error
+            return null;
         }
     };
 
@@ -41,7 +40,7 @@ const FavoritesModal = ({ onClose, favorites  }) => {
         const fetchAllMoviesDetails = async () => {
             const detailsPromises = favorites.map(movieId => fetchMovieInfo(movieId));
             const details = await Promise.all(detailsPromises);
-            setMoviesDetails(details.filter(detail => detail)); // Filter out any null responses
+            setMoviesDetails(details.filter(detail => detail));
             setLoadingInfo(false);
         };
 
@@ -75,11 +74,11 @@ const FavoritesModal = ({ onClose, favorites  }) => {
                         onClick={onClose}
                         sx={{
                         position: 'sticky',
-                        top: 0,           // Stick the button to the top of the scrolling area
+                        top: 0,         
                         left: 0,
                         color: 'text.secondary',
                         zIndex: 999,
-                        bgcolor: 'white', // Add background color if needed for visibility
+                        bgcolor: 'white',
                         }}
                     >
                         <CloseIcon />
@@ -89,7 +88,7 @@ const FavoritesModal = ({ onClose, favorites  }) => {
                     </Typography>
                     <Box>
                         {loadingInfo ? (
-                            <CircularProgress /> // Show a loading spinner while fetching
+                            <CircularProgress />
                         ) : (
                             moviesDetails.length > 0 ? (
                                 <>
