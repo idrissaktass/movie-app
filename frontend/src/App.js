@@ -8,7 +8,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Grid } from '@mui/material';
 import SearchResults from './components/SearchResults';
 
-const theme = createTheme({
+const theme = createTheme({ 
   breakpoints: {
     values: {
       xs: 0,
