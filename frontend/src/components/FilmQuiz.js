@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, Typography, CircularProgress, Box, Fade, Grid } from '@mui/material';
 import Navbar from './Navbar';
+import { Helmet } from "react-helmet-async";
 
 const FilmQuiz = () => {
   const [questions, setQuestions] = useState([]);
@@ -57,6 +58,15 @@ const FilmQuiz = () => {
 
   return (
     <Grid>
+          <Helmet>
+      <title>Movie Quiz - Test Your Film Knowledge!</title>
+      <meta name="description" content="Challenge yourself with our exciting movie quiz. Test your film knowledge and see how many movies you can recognize!" />
+      <meta name="keywords" content="Movie Quiz, Film Quiz, Movie Trivia, Film Knowledge Test, Movie Games" />
+      <meta name="author" content="idrisaktas.online" />
+      <meta property="og:title" content="Movie Quiz - Test Your Film Knowledge!" />
+      <meta property="og:description" content="Challenge yourself with our exciting movie quiz. Test your film knowledge and see how many movies you can recognize!" />
+      <meta property="og:type" content="website" />
+    </Helmet>
       <Navbar/>
       <Grid container p={2} justifyContent={"center"}>
         <Grid item xs={12} md={10} lg={8} xl={6}>

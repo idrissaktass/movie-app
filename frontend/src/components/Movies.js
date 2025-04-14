@@ -18,6 +18,7 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
+import { Helmet } from "react-helmet-async";
 
 const genresList = [
   { id: 28, name: 'Action' },
@@ -589,6 +590,15 @@ const handleAddToWatchlist = async (movieId) => {
 
   return (
     <Grid>
+          <Helmet>
+      <title>CineScope - Find Your Movie!</title>
+      <meta name="description" content="Find your movie with suggestions" />
+      <meta name="keywords" content="Movie Quiz, Film Quiz, Movie Trivia, Film Knowledge Test, Movie Games, movie, movies, film, films, movie suggestion, film suggestion, movie by mood" />
+      <meta name="author" content="idrisaktas.online" />
+      <meta property="og:title" content="CineScope - Find Your Movie!" />
+      <meta property="og:description" content="Find your movie with suggestions" />
+      <meta property="og:type" content="website" />
+    </Helmet>
       <Navbar/>
       <Grid container flexDirection="column" alignItems="center" gap={5} pb={10}>
         {/* Hero Section */}

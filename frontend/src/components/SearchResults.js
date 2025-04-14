@@ -7,6 +7,8 @@ import Navbar from './Navbar';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import MovieModal from './MovieModal';
+import { Helmet } from "react-helmet-async";
+
 const SearchResults = ({ onClose, SearchResults  }) => {
   const [genres, setGenres] = useState([]);
   const [releaseYears, setReleaseYears] = useState([]);
@@ -149,6 +151,15 @@ const SearchResults = ({ onClose, SearchResults  }) => {
 
   return (
     <Grid>
+                <Helmet>
+            <title>CineScope - Find Your Movie!</title>
+            <meta name="description" content="Find your movie with searching" />
+            <meta name="keywords" content="Movie Quiz, Film Quiz, Movie Trivia, Film Knowledge Test, Movie Games, movie, movies, film, films, movie suggestion, film suggestion, movie by mood" />
+            <meta name="author" content="idrisaktas.online" />
+            <meta property="og:title" content="CineScope - Find Your Movie!" />
+            <meta property="og:description" content="Find your movie with suggestions" />
+            <meta property="og:type" content="website" />
+          </Helmet>
       <Navbar />
       <Grid container paddingInline={{ xs: 1, sm: 3, md: 5, lg: 10 }} paddingTop={2} paddingBottom={8} gap={3} justifyContent={'center'}>
         <Grid>
