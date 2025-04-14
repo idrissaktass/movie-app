@@ -18,7 +18,6 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
-import CreateList from './CreateList';
 
 const genresList = [
   { id: 28, name: 'Action' },
@@ -937,16 +936,6 @@ const handleAddToWatchlist = async (movieId) => {
                               {/* <Button onClick={handleAddToListClick}>
                                   Add to a List
                               </Button> */}
-
-                              <Dialog open={open} onClose={handleClose}>
-                                  <DialogTitle>Create a New List</DialogTitle>
-                                  <DialogContent>
-                                      <CreateList selectedMovie={selectedMovie}  onClose={handleClose} />
-                                  </DialogContent>
-                                  <DialogActions>
-                                      <Button onClick={handleClose}>Cancel</Button>
-                                  </DialogActions>
-                              </Dialog>
                           </div>
                           </Grid>
                         </Grid>
@@ -1057,15 +1046,6 @@ const handleAddToWatchlist = async (movieId) => {
                 Add to a List
             </Button> */}
 
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Create a New List</DialogTitle>
-                <DialogContent>
-                    <CreateList selectedMovie={selectedMovie}  onClose={handleClose} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                </DialogActions>
-            </Dialog>
         </div>
                 </Grid>
               </Grid>
@@ -1339,15 +1319,6 @@ const handleAddToWatchlist = async (movieId) => {
                                     Add to a List
                                 </Button> */}
 
-                                <Dialog open={open} onClose={handleClose}>
-                                    <DialogTitle>Create a New List</DialogTitle>
-                                    <DialogContent>
-                                        <CreateList selectedMovie={selectedMovie} onClose={handleClose} />
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button onClick={handleClose}>Cancel</Button>
-                                    </DialogActions>
-                                </Dialog>
                             </div>
                           </Grid>
                         </Grid>

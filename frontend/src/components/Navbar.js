@@ -18,7 +18,7 @@ import Login from "./Login";
 import WatchlistModal from "./WatchlistModal";
 import FavoritesModal from "./FavoritesModal";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation  } from "react-router-dom";
 import { fetchWatchlistService, fetchFavoritesService } from "../services/AuthService";
 import { useTheme } from "@mui/material/styles";
 
@@ -74,6 +74,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const location = useLocation();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -99,6 +100,7 @@ const Navbar = () => {
   }
   const handleFavoritesOpen = async () => {
     if (!isAuthenticated) {
+      alert("Please login first!");
       navigate("/login");
       setAnchorEl(null);
       return;
@@ -116,6 +118,7 @@ const Navbar = () => {
 
   const handleWatchlistOpen = async () => {
     if (!isAuthenticated) {
+      alert("Please login first!");
       navigate("/login");
       setAnchorEl(null);
       return;
@@ -167,6 +170,18 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  const handleQuiz = () => {
+    if (!isAuthenticated) {
+      alert("Please login first!");
+      navigate("/login");
+      setAnchorEl(null);
+      return;
+    }
+    navigate("/quiz");
+    setAnchorEl(null);
+  };
+  const getButtonColor = (path) => (location.pathname === path ? "black" : "inherit");
+
   return (
     <AppBar position="static" sx={{ backgroundColor: "#934c14" }}>
       <Toolbar>
@@ -182,16 +197,19 @@ const Navbar = () => {
           </Typography>
         </Grid>
         <Box sx={{ display: { xs: "none", md: "flex" }, ml: 2 }}>
-          <Button color="inherit" onClick={handleHome}>
+          <Button sx={{ color: getButtonColor("/") }} onClick={handleHome}>
             Home
           </Button>
-          <Button color="inherit" onClick={handleSearchOptions}>
+          <Button sx={{ color: getButtonColor("/search-results") }} onClick={handleSearchOptions}>
             Search Movies
           </Button>
-          <Button color="inherit" onClick={handleWatchlistOpen}>
+          <Button sx={{ color: getButtonColor("/quiz") }} onClick={handleQuiz}>
+            Quiz
+          </Button>
+          <Button sx={{ color: "inherit" }} onClick={handleWatchlistOpen}>
             Watchlist
           </Button>
-          <Button color="inherit" onClick={handleFavoritesOpen}>
+          <Button sx={{ color: "inherit" }} onClick={handleFavoritesOpen}>
             Favorites
           </Button>
         </Box>
@@ -225,10 +243,11 @@ const Navbar = () => {
                 <MenuIcon />
               </IconButton>
               <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                <MenuItem onClick={handleHome}>Home</MenuItem>
+                <MenuItem sx={{ color: getButtonColor("/") }} onClick={handleHome}>Home</MenuItem>
                 <MenuItem onClick={handleWatchlistOpen}>Watchlist</MenuItem>
                 <MenuItem onClick={handleFavoritesOpen}>Favorites</MenuItem>
-                <MenuItem onClick={handleSearchOptions}>Search Movies</MenuItem>
+                <MenuItem sx={{ color: getButtonColor("/quiz") }} onClick={handleQuiz}>Quiz</MenuItem>
+                <MenuItem sx={{ color: getButtonColor("/search-results") }} onClick={handleSearchOptions}>Search Movies</MenuItem>
 
                 {isAuthenticated ? (
                   <MenuItem onClick={handleLogout}>Logout</MenuItem>

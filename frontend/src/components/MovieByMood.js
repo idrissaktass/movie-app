@@ -141,21 +141,6 @@ const MovieByMood = (selectedMovie, onOpen  ) => {
                                     <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
                                   )}                  
                               </Button>
-                              <div>
-              <Button onClick={handleAddToListClick}>
-                  Add to a List
-              </Button>
-  
-              <Dialog open={open} onClose={handleClose}>
-                  <DialogTitle>Create a New List</DialogTitle>
-                  <DialogContent>
-                      <CreateList selectedMovie={selectedMovie}  onClose={handleClose} />
-                  </DialogContent>
-                  <DialogActions>
-                      <Button onClick={handleClose}>Cancel</Button>
-                  </DialogActions>
-              </Dialog>
-          </div>
                             </Grid>
                           </Grid>
                         </Grid>

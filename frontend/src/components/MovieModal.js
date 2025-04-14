@@ -5,7 +5,6 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
-import CreateList from './CreateList'; // Adjust the import based on your file structure
 import axios from 'axios';
 import { addFavoriteService, addToWatchlistService, removeFavoriteService, removeFromWatchlistService, fetchFavoritesService,fetchWatchlistService } from "../services/AuthService";
 const apiKey = '404bc2a47139c3a5d826814f03794b21'; // TMDB API key
@@ -409,16 +408,7 @@ const handleAddToWatchlist = async () => {
                   {/* <Button onClick={handleAddToListClick}>
                       Add to a List
                   </Button> */}
-          
-                          <Dialog open={open} onClose={handleClose}>
-                              <DialogTitle>Create a New List</DialogTitle>
-                              <DialogContent>
-                                  <CreateList selectedMovie={selectedMovie}  onClose={handleClose} />
-                              </DialogContent>
-                              <DialogActions>
-                                  <Button onClick={handleClose}>Cancel</Button>
-                              </DialogActions>
-                          </Dialog>
+
                       </div>
                       </Grid>
                     </Grid>

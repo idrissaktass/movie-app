@@ -7,6 +7,7 @@ import Signup from './components/Signup';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Grid } from '@mui/material';
 import SearchResults from './components/SearchResults';
+import FilmQuiz from './components/FilmQuiz';
 
 const theme = createTheme({ 
   breakpoints: {
@@ -30,6 +31,7 @@ function App() {
           <Router>
             <Routes>
               <Route path="/" element={<Movies />} />
+              <Route path="/quiz" element={<FilmQuiz />} />
               <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/search-results" element={<SearchResults/>} />

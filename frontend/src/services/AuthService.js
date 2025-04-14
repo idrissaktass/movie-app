@@ -175,59 +175,59 @@ export const fetchWatchlistService = async (email) => {
 
 // AuthService.js
 
-export const createListService = async (email, listName, isPublic) => {
-  const response = await fetch(`${BASE_URL}/create-list`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
+// export const createListService = async (email, listName, isPublic) => {
+//   const response = await fetch(`${BASE_URL}/create-list`, {
+//       method: 'POST',
+//       headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': `Bearer ${localStorage.getItem('token')}`
+//       },
 
-      body: JSON.stringify({ email, listName, isPublic }),
-      credentials: 'include' // Add this line if necessary
+//       body: JSON.stringify({ email, listName, isPublic }),
+//       credentials: 'include' // Add this line if necessary
 
-  });
+//   });
 
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message);
-  return data; // You can return whatever is necessary
-};
+//   const data = await response.json();
+//   if (!response.ok) throw new Error(data.message);
+//   return data; // You can return whatever is necessary
+// };
 // AuthService.js
 
-export const getUserListsService = async (email) => {
-  const response = await fetch(`${BASE_URL}/get-lists`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
+// export const getUserListsService = async (email) => {
+//   const response = await fetch(`${BASE_URL}/get-lists`, {
+//       method: 'POST',
+//       headers: {
+//           'Content-Type': 'application/json',
+//       },
 
-      body: JSON.stringify({ email }), // Send email in body
-      credentials: 'include' // Add this line if necessary
+//       body: JSON.stringify({ email }), // Send email in body
+//       credentials: 'include' // Add this line if necessary
 
-  });
+//   });
   
-  if (!response.ok) {
-      throw new Error('Failed to fetch lists');
-  }
-  return await response.json(); // Assuming the response is JSON
-};
+//   if (!response.ok) {
+//       throw new Error('Failed to fetch lists');
+//   }
+//   return await response.json(); // Assuming the response is JSON
+// };
 
 // AuthService.js
 
-export const addMovieToListService = async (email, listName, movieId) => {
-  const response = await fetch(`${BASE_URL}/add-to-list`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
+// export const addMovieToListService = async (email, listName, movieId) => {
+//   const response = await fetch(`${BASE_URL}/add-to-list`, {
+//       method: 'POST',
+//       headers: {
+//           'Content-Type': 'application/json',
+//       },
 
-      body: JSON.stringify({ email, listName, movieId }), // Adjust the body as needed
-      credentials: 'include' // Add this line if necessary
+//       body: JSON.stringify({ email, listName, movieId }), // Adjust the body as needed
+//       credentials: 'include' // Add this line if necessary
 
-  });
+//   });
   
-  if (!response.ok) {
-      throw new Error('Failed to add movie to the list');
-  }
-  return await response.json(); // Assuming the response is JSON
-};
+//   if (!response.ok) {
+//       throw new Error('Failed to add movie to the list');
+//   }
+//   return await response.json(); // Assuming the response is JSON
+// };
