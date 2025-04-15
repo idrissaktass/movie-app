@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext  } from 'react';
 import { Grid, Typography, Button, Card, CardContent, CardMedia, useMediaQuery,
-  Modal, Box, CircularProgress, List, ListItem, IconButton, FormGroup, FormControl, InputLabel, Select, MenuItem,
-  FormControlLabel, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert  } from '@mui/material';
+  Modal, Box, CircularProgress, List, ListItem, IconButton, FormControl, InputLabel, Select, MenuItem,
+  FormControlLabel, Checkbox, Snackbar, Alert  } from '@mui/material';
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
 import { Helmet } from "react-helmet-async";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const genresList = [
   { id: 28, name: 'Action' },
@@ -107,6 +108,9 @@ function Movies() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [selectedGenreNames, setSelectedGenreNames] = useState([]);
+  const [movieTrailerUrl, setMovieTrailerUrl] = useState("");
+  const [showTrailer, setShowTrailer] = useState(false);
+  const [showTrailerId, setShowTrailerId] = useState(null);
 
   const handleAddToListClick = () => {
     setOpen(true); // Open the dialog
@@ -120,6 +124,38 @@ function Movies() {
 
   const handleClose = () => {
       setOpen(false);
+  };
+  
+  const fetchMovieTrailer = async (movie) => {
+    setLoadingInfo(true)
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/movie/${movie.id}/videos?language=en-US`,
+        {
+          headers: {
+            accept: 'application/json',
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0MDRiYzJhNDcxMzljM2E1ZDgyNjgxNGYwMzc5NGIyMSIsIm5iZiI6MTcyNjYxMzg3MC43NTcwODIsInN1YiI6IjY1NGEwN2JjMjg2NmZhMDBjNDI1OWJmNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7jP0jl8WExn2tVvRBfkna_WrlXoGYbYCZDKcAwVoRbA'
+          }
+        }
+      );
+  
+      const videos = response.data.results;
+  
+      const trailer = videos.find(
+        (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+      );
+  
+      if (trailer) {
+        setMovieTrailerUrl(`https://www.youtube.com/embed/${trailer.key}`);
+      } else {
+        setMovieTrailerUrl(null);
+      }
+    } catch (error) {
+      console.error("Error fetching movie trailer:", error);
+      setMovieTrailerUrl(null);
+    } finally {
+      setLoadingInfo(false)
+    }
   };
 
   useEffect(() => {
@@ -860,7 +896,7 @@ const handleAddToWatchlist = async (movieId) => {
                   console.log("details",moviesDetails)
                   return (
                     <Box key={movie.id} sx={{ mb: 3 }} pl={{xs:2, sm:3.5}}>
-                      <Typography variant="h6">{movie.title}</Typography>
+                      <Typography variant="h6" display={showTrailerId !== movie.id ? "unset" : "none"}>{movie.title}</Typography>
                       <Grid 
                         mb={{ xs: "15px", md: "20px" }} 
                         item 
@@ -872,74 +908,121 @@ const handleAddToWatchlist = async (movieId) => {
                         paddingBlock={{ xs: "10px", md: "unset" }} 
                         paddingLeft={{ xs: "10px", md: "0px" }} 
                         sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)' }}>
-                          <Grid display={'flex'} justifyContent={'center'}>
-                            <Box 
-                            height={{xs:"50%", sm:"600px", md:"100%"}}
-                            width={{xs:"100%", sm:"70%", md:"250px"}} 
-                            overflow="hidden" 
-                            display={"flex"} 
-                            justifyContent="center"
-                          >
-                            <Box
-                              component="img"
-                              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                              alt={movie.title}
-                              sx={{ 
-                                width: '100%',       // Kutunun genişliğine tam sığacak
-                                height: 'auto',      // Kutunun yüksekliğine tam sığacak
-                                objectFit: 'cover',  // Resim kutunun içinde tam görünür
-                              }}
+                          {showTrailerId !== movie.id ? (
+                            <>
+                              <Grid display={'flex'} justifyContent={'center'} position="relative">
+                                <Box
+                                  height={{ xs: "50%", sm: "600px", md: "100%" }}
+                                  width={{ xs: "100%", sm: "70%", md: "250px" }}
+                                  overflow="hidden"
+                                  display={"flex"}
+                                  justifyContent="center"
+                                  position="relative"
+                                >
+                                  <Box
+                                    component="img"
+                                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                    alt={movie.title}
+                                    sx={{
+                                      width: '100%',
+                                      height: 'auto',
+                                      objectFit: 'cover',
+                                    }}
+                                  />
+                                  {isSmallScreen && (
+                                    <Button
+                                      variant="contained"
+                                      size="medium"
+                                      onClick={() => {
+                                        fetchMovieTrailer(movie);
+                                        setShowTrailerId(movie.id);
+                                      }}
+                                      sx={{
+                                        position: "absolute",
+                                        bottom: 5,
+                                        right: 5,
+                                        backgroundColor: "#ff7b2e",
+                                      }}
+                                    >
+                                      Watch Trailer
+                                    </Button>
+                                  )}
+                                </Box>
+                              </Grid>
+                            <Grid>
+                              <Typography variant="body2" mt={2}>
+                                {movie.overview}
+                              </Typography>
+                              <Typography variant="body1" mt={2}>
+                                <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'Unknown'}/10
+                              </Typography>
+                              <Typography variant="body1" mt={1}>
+                                <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
+                              </Typography>
+                              <Typography variant="body1" mt={1}>
+                                <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'Unknown'}
+                              </Typography>
+                              <Typography variant="body1" mt={1}>
+                                <strong>Release Date:</strong> {details?.release_date || 'Unknown'}
+                              </Typography>
+                              <Typography variant="body1" mt={1}>
+                                <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'Unknown'}
+                              </Typography>
+                              <Typography variant="body1" mt={1}>
+                                <strong>Tagline:</strong> {details?.tagline || 'Unknown'}
+                              </Typography>
+                              {!isSmallScreen && (
+                                <Button
+                                  variant="contained"
+                                  onClick={() => {
+                                    fetchMovieTrailer(movie);
+                                    setShowTrailerId(movie.id);
+                                  }}
+                                  sx={{ mt: 2 }}
+                                >
+                                  <Typography variant="body1">Watch Trailer</Typography>
+                                </Button>
+                              )}
+                              <Grid container mt={1} gap={1} mb={1}>
+                              <Button onClick={() => handleAddToFavorites(movie.id)}disabled={loadingFavorites}>
+                                {loadingFavorites ? (
+                                    <CircularProgress size={24} /> // Loading indicator
+                                ) : isMovieFavorite ? (
+                                    <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
+                                ) : (
+                                    <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
+                                )}
+                            </Button>
+                            <Button onClick={handleAddToWatchlist} disabled={loadingWatchlist}>
+                                {loadingWatchlist ? (
+                                    <CircularProgress size={24} /> // Loading indicator
+                                ) : isMovieInWatchlist ? (
+                                    <WatchLaterIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                                ) : (
+                                    <WatchLaterOutlinedIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                                )}
+                            </Button>
+                                <div>
+                                  {/* <Button onClick={handleAddToListClick}>
+                                      Add to a List
+                                  </Button> */}
+                              </div>
+                              </Grid>
+                            </Grid>
+                            </>
+                          ) : (
+                            <Grid position={"relative"} width={"100%"} display={"flex"} justifyContent={"center"} my={5}>
+                            <ArrowBackIcon onClick={() => setShowTrailerId(null)} style={{ color: 'rgb(0 0 0 / 60%)', fontSize: "28px", position:"absolute", top:"-40px", left:"0", cursor:"pointer"}}/>
+                            <iframe
+                              width="840"
+                              height="467.5"
+                              src={movieTrailerUrl}
+                              title="Movie Trailer"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
                             />
-                          </Box>
-                          </Grid>
-                        <Grid>
-                          <Typography variant="body2" mt={2}>
-                            {movie.overview}
-                          </Typography>
-                          <Typography variant="body1" mt={2}>
-                            <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'Unknown'}/10
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'Unknown'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Release Date:</strong> {details?.release_date || 'Unknown'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'Unknown'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Tagline:</strong> {details?.tagline || 'Unknown'}
-                          </Typography>
-                          <Grid container mt={1} gap={1} mb={1}>
-                          <Button onClick={() => handleAddToFavorites(movie.id)}disabled={loadingFavorites}>
-                            {loadingFavorites ? (
-                                <CircularProgress size={24} /> // Loading indicator
-                            ) : isMovieFavorite ? (
-                                <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
-                            ) : (
-                                <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
-                            )}
-                        </Button>
-                        <Button onClick={handleAddToWatchlist} disabled={loadingWatchlist}>
-                            {loadingWatchlist ? (
-                                <CircularProgress size={24} /> // Loading indicator
-                            ) : isMovieInWatchlist ? (
-                                <WatchLaterIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
-                            ) : (
-                                <WatchLaterOutlinedIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
-                            )}
-                        </Button>
-                            <div>
-                              {/* <Button onClick={handleAddToListClick}>
-                                  Add to a List
-                              </Button> */}
-                          </div>
-                          </Grid>
-                        </Grid>
+                            </Grid>
+                          )}
                       </Grid>
                     </Box>
                   );
@@ -978,78 +1061,124 @@ const handleAddToWatchlist = async (movieId) => {
                   {selectedMovie.title} ({selectedMovie.release_date?.split('-')[0]})
                 </Typography>
               </Grid>
-              <Grid mb={{xs:"0px", md:"20px"}} item xs={11.5} md={6} textAlign={"center"} sx={{ background: {xs:'linear-gradient(to right, #ff923c12, #ff923c42)', md:'linear-gradient(to right, transparent, #ff923c12)'}}}>
-                <Box height={{xs:"475px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'}>
-                  <Box
-                    component="img"
-                    src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
-                    alt={selectedMovie.title}
-                    sx={{ width: {xs:"100%", md:"85%", lg:"80%", xl:"70%"}, position: 'relative', alignSelf:"center" }}
-                  />
-                </Box>
-              </Grid>
-              {loadingInfo ? (
-                  <CircularProgress />
+              { showTrailerId !== selectedMovie.id ? (
+                  <Grid container>
+                  <Grid mb={{xs:"0px", md:"20px"}} item xs={11.5} md={6} textAlign={"center"} position={"relative"} sx={{ background: {xs:'linear-gradient(to right, #ff923c12, #ff923c42)', md:'linear-gradient(to right, transparent, #ff923c12)'}}}>
+                    <Box height={{xs:"475px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'} position={"relative"}>
+                      <Box
+                        component="img"
+                        src={`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`}
+                        alt={selectedMovie.title}
+                        sx={{ width: {xs:"100%", md:"85%", lg:"80%", xl:"70%"}, position: 'relative', alignSelf:"center" }}
+                      />
+                      {isSmallScreen && (
+                        <Button
+                          variant="contained"
+                          size="medium"
+                          onClick={() => {
+                            fetchMovieTrailer(selectedMovie);
+                            setShowTrailerId(selectedMovie.id);
+                          }}
+                          sx={{
+                            position: "absolute",
+                            bottom: 15,
+                            right: 5,
+                            backgroundColor: "#ff7b2e",
+                          }}
+                        >
+                          Watch Trailer
+                        </Button>
+                      )}
+                    </Box>
+                  </Grid>
+                  {loadingInfo ? (
+                      <CircularProgress />
+                  ) : (
+                    <Grid mb={{xs:"15px", md:"20px"}} item xs={11.5} md={6} pr={{xs:"10px", md:"20px"}} paddingBlock={{xs:"10px", md:"unset"}} paddingLeft={{xs:"10px", md:"0px"}} sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)'}}>
+                    <Typography variant="body2" mt={2}>
+                      {selectedMovie.overview}
+                    </Typography>
+                    <Typography variant="body1" mt={2}>
+                      <strong>Score:</strong> {Math.round(movieDetails.vote_average * 10) / 10}/10
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      <strong>Runtime:</strong> {movieDetails.runtime || 'Unknown'} minutes
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      <strong>Genres:</strong> {movieDetails.genres?.map(genre => genre.name).join(', ')}
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      <strong>Release Date:</strong> {movieDetails.release_date}
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      <strong>Original Language:</strong> {movieDetails.original_language?.toUpperCase()}
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      <strong>Budget:</strong> {movieDetails.budget ? `$${movieDetails.budget.toLocaleString()}` : 'Unknown'}
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      <strong>Revenue:</strong> {movieDetails.revenue ? `$${movieDetails.revenue.toLocaleString()}` : 'Unknown'}
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      <strong>Production Companies:</strong> {movieDetails.production_companies?.map(company => company.name).join(', ')}
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      <strong>Tagline:</strong> {movieDetails.tagline || 'Unknown'}
+                    </Typography>
+                    {!isSmallScreen && (
+                      <Button
+                        variant="contained"
+                        onClick={() => {
+                          fetchMovieTrailer(selectedMovie);
+                          setShowTrailerId(selectedMovie.id);
+                        }}
+                        sx={{ mt: 2 }}
+                      >
+                        <Typography variant="body1">Watch Trailer</Typography>
+                      </Button>
+                    )}
+                    <Grid container mt={3} gap={1}>
+                    <Button onClick={() => handleAddToFavorites(selectedMovie.id)} disabled={loadingFavorites}>
+                      {loadingFavorites ? (
+                        <CircularProgress size={24} style={{ color: 'red' }} />
+                      ) : isFavorite ? (
+                        <FavoriteIcon style={{ color:'red', fontSize: "36px" }} />
+                      ) : (
+                        <FavoriteBorderOutlinedIcon style={{ color:'red', fontSize: "36px" }} />
+                      )}
+                    </Button>
+                    
+                    <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} disabled={loadingWatchlist}>
+                      {loadingWatchlist ? (
+                        <CircularProgress size={24} style={{ color: '#ff7b2e' }} />
+                      ) : isInWatchlist ? (
+                        <WatchLaterIcon style={{ color:'#ff7b2e', fontSize: "36px" }} />
+                      ) : (
+                        <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize: "36px" }} />
+                      )}
+                    </Button>
+                      <div>
+                {/* <Button onClick={handleAddToListClick}>
+                    Add to a List
+                </Button> */}
+    
+            </div>
+                    </Grid>
+                  </Grid>
+                  )}
+                  </Grid>
               ) : (
-                <Grid mb={{xs:"15px", md:"20px"}} item xs={11.5} md={6} pr={{xs:"10px", md:"20px"}} paddingBlock={{xs:"10px", md:"unset"}} paddingLeft={{xs:"10px", md:"0px"}} sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)'}}>
-                <Typography variant="body2" mt={2}>
-                  {selectedMovie.overview}
-                </Typography>
-                <Typography variant="body1" mt={2}>
-                  <strong>Score:</strong> {Math.round(movieDetails.vote_average * 10) / 10}/10
-                </Typography>
-                <Typography variant="body1" mt={1}>
-                  <strong>Runtime:</strong> {movieDetails.runtime || 'Unknown'} minutes
-                </Typography>
-                <Typography variant="body1" mt={1}>
-                  <strong>Genres:</strong> {movieDetails.genres?.map(genre => genre.name).join(', ')}
-                </Typography>
-                <Typography variant="body1" mt={1}>
-                  <strong>Release Date:</strong> {movieDetails.release_date}
-                </Typography>
-                <Typography variant="body1" mt={1}>
-                  <strong>Original Language:</strong> {movieDetails.original_language?.toUpperCase()}
-                </Typography>
-                <Typography variant="body1" mt={1}>
-                  <strong>Budget:</strong> {movieDetails.budget ? `$${movieDetails.budget.toLocaleString()}` : 'Unknown'}
-                </Typography>
-                <Typography variant="body1" mt={1}>
-                  <strong>Revenue:</strong> {movieDetails.revenue ? `$${movieDetails.revenue.toLocaleString()}` : 'Unknown'}
-                </Typography>
-                <Typography variant="body1" mt={1}>
-                  <strong>Production Companies:</strong> {movieDetails.production_companies?.map(company => company.name).join(', ')}
-                </Typography>
-                <Typography variant="body1" mt={1}>
-                  <strong>Tagline:</strong> {movieDetails.tagline || 'Unknown'}
-                </Typography>
-                <Grid container mt={3} gap={1}>
-                <Button onClick={() => handleAddToFavorites(selectedMovie.id)} disabled={loadingFavorites}>
-                  {loadingFavorites ? (
-                    <CircularProgress size={24} style={{ color: 'red' }} />
-                  ) : isFavorite ? (
-                    <FavoriteIcon style={{ color:'red', fontSize: "36px" }} />
-                  ) : (
-                    <FavoriteBorderOutlinedIcon style={{ color:'red', fontSize: "36px" }} />
-                  )}
-                </Button>
-                
-                <Button onClick={() => handleAddToWatchlist(selectedMovie.id)} disabled={loadingWatchlist}>
-                  {loadingWatchlist ? (
-                    <CircularProgress size={24} style={{ color: '#ff7b2e' }} />
-                  ) : isInWatchlist ? (
-                    <WatchLaterIcon style={{ color:'#ff7b2e', fontSize: "36px" }} />
-                  ) : (
-                    <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize: "36px" }} />
-                  )}
-                </Button>
-                  <div>
-            {/* <Button onClick={handleAddToListClick}>
-                Add to a List
-            </Button> */}
-
-        </div>
+                <Grid position={"relative"} width={"100%"} display={"flex"} justifyContent={"center"} my={5}>
+                <ArrowBackIcon onClick={() => setShowTrailerId(null)} style={{ color: 'rgb(0 0 0 / 60%)', fontSize: "28px", position:"absolute", top:"-40px", left:"0", cursor:"pointer"}}/>
+                <iframe
+                  width="840"
+                  height="467.5"
+                  src={movieTrailerUrl}
+                  title="Movie Trailer"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
                 </Grid>
-              </Grid>
               )}
               {/* Reviews section */}
               <Grid container justifyContent="center" xs={12}>
@@ -1226,8 +1355,8 @@ const handleAddToWatchlist = async (movieId) => {
                   console.log("details",moviesDetails)
                   return (
                     <Box key={movie.id} sx={{ mb: 3 }}>
-                      <Typography variant="h6">{movie.title}</Typography>
-                      <Grid 
+                      <Typography variant="h6" display={showTrailerId !== movie.id ? "unset" : "none"}>{movie.title}</Typography>
+                      <Grid position="relative"
                         mb={{ xs: "15px", md: "20px" }} 
                         item 
                         xs={11.5} 
@@ -1239,81 +1368,127 @@ const handleAddToWatchlist = async (movieId) => {
                         paddingBlock={{ xs: "10px", md: "unset" }} 
                         paddingLeft={{ xs: "10px", md: "0px" }} 
                         sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)' }}>
-                            <Grid display={'flex'} justifyContent={'center'}>
-                              <Box 
-                              height={{xs:"50%", sm:"600px", md:"100%"}}
-                              width={{xs:"100%", sm:"70%", md:"250px"}} 
-                              overflow="hidden" 
-                              display={"flex"} 
-                              justifyContent="center"
-                            >
-                              <Box
-                                component="img"
-                                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                                alt={movie.title}
-                                sx={{ 
-                                  width: '100%',       // Kutunun genişliğine tam sığacak
-                                  height: 'auto',      // Kutunun yüksekliğine tam sığacak
-                                  objectFit: 'cover',  // Resim kutunun içinde tam görünür
+                          {showTrailerId !== movie.id ? (
+                            <>
+                              <Grid display={'flex'} justifyContent={'center'}>
+                                <Box position="relative"
+                                height={{xs:"50%", sm:"600px", md:"100%"}}
+                                width={{xs:"100%", sm:"70%", md:"250px"}} 
+                                overflow="hidden" 
+                                display={"flex"} 
+                                justifyContent="center"
+                              >
+                                <Box
+                                  component="img"
+                                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                  alt={movie.title}
+                                  sx={{ 
+                                    width: '100%',       // Kutunun genişliğine tam sığacak
+                                    height: 'auto',      // Kutunun yüksekliğine tam sığacak
+                                    objectFit: 'cover',  // Resim kutunun içinde tam görünür
+                                  }}
+                                />
+                              </Box>
+                              {isSmallScreen && (
+                                <Button
+                                  variant="contained"
+                                  size="medium"
+                                  onClick={() => {
+                                    fetchMovieTrailer(movie);
+                                    setShowTrailerId(movie.id);
+                                  }}
+                                  sx={{
+                                    position: "absolute",
+                                    bottom: 5,
+                                    right: 5,
+                                    backgroundColor: "#ff7b2e",
+                                  }}
+                                >
+                                  Watch Trailer
+                                </Button>
+                              )}
+                              </Grid>
+                          <Grid>
+                            <Typography variant="body2" mt={2}>
+                              {movie.overview}
+                            </Typography>
+                            <Typography variant="body1" mt={2}>
+                              <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'Unknown'}/10
+                            </Typography>
+                            <Typography variant="body1" mt={1}>
+                              <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
+                            </Typography>
+                            <Typography variant="body1" mt={1}>
+                              <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'Unknown'}
+                            </Typography>
+                            <Typography variant="body1" mt={1}>
+                              <strong>Release Date:</strong> {details?.release_date || 'Unknown'}
+                            </Typography>
+                            <Typography variant="body1" mt={1}>
+                              <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'Unknown'}
+                            </Typography>
+                            <Typography variant="body1" mt={1}>
+                              <strong>Tagline:</strong> {details?.tagline || 'Unknown'}
+                            </Typography>
+                            {!isSmallScreen && (
+                              <Button
+                                variant="contained"
+                                onClick={() => {
+                                  fetchMovieTrailer(movie);
+                                  setShowTrailerId(movie.id);
                                 }}
-                              />
-                            </Box>
-                            </Grid>
-                        <Grid>
-                          <Typography variant="body2" mt={2}>
-                            {movie.overview}
-                          </Typography>
-                          <Typography variant="body1" mt={2}>
-                            <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'Unknown'}/10
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'Unknown'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Release Date:</strong> {details?.release_date || 'Unknown'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'Unknown'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Tagline:</strong> {details?.tagline || 'Unknown'}
-                          </Typography>
-                          <Grid container  mt={1} gap={1} mb={1}>
-                            <Button onClick={() => {
-                                setSelectedMovie(movie); // Set the selected movie
-                                handleAddToFavorites(movie.id); // Pass movie.id to the function
-                            }}>
-                                {loadingFavorites ? (
-                                  <CircularProgress size={24} style={{ color: 'red' }} />
-                                ) : favoriteMovies[movie.id] ? (
-                                  <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
-                                ) : (
-                                  <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
-                                )}
-                            </Button>
+                                sx={{ mt: 2 }}
+                              >
+                                <Typography variant="body1">Watch Trailer</Typography>
+                              </Button>
+                            )}
+                            <Grid container  mt={1} gap={1} mb={1}>
                               <Button onClick={() => {
                                   setSelectedMovie(movie); // Set the selected movie
-                                  handleAddToWatchlist(movie.id); // Pass movie.id to the function
+                                  handleAddToFavorites(movie.id); // Pass movie.id to the function
                               }}>
-                                {loadingWatchlist ? (
+                                  {loadingFavorites ? (
                                     <CircularProgress size={24} style={{ color: 'red' }} />
-                                  ) : watchlistMovies[movie.id] ? (
-                                    <WatchLaterIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
+                                  ) : favoriteMovies[movie.id] ? (
+                                    <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
                                   ) : (
-                                    <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
-                                  )}                  
+                                    <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
+                                  )}
                               </Button>
-                            <div>
-                                {/* <Button onClick={handleAddToListClick}>
-                                    Add to a List
-                                </Button> */}
+                                <Button onClick={() => {
+                                    setSelectedMovie(movie); // Set the selected movie
+                                    handleAddToWatchlist(movie.id); // Pass movie.id to the function
+                                }}>
+                                  {loadingWatchlist ? (
+                                      <CircularProgress size={24} style={{ color: 'red' }} />
+                                    ) : watchlistMovies[movie.id] ? (
+                                      <WatchLaterIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
+                                    ) : (
+                                      <WatchLaterOutlinedIcon style={{ color:'#ff7b2e', fontSize:"36px" }} />
+                                    )}                  
+                                </Button>
+                              <div>
+                                  {/* <Button onClick={handleAddToListClick}>
+                                      Add to a List
+                                  </Button> */}
 
-                            </div>
+                              </div>
+                            </Grid>
                           </Grid>
-                        </Grid>
+                            </>
+                          ) : (
+                              <Grid position={"relative"} width={"100%"} display={"flex"} justifyContent={"center"} my={5}>
+                              <ArrowBackIcon onClick={() => setShowTrailerId(null)} style={{ color: 'rgb(0 0 0 / 60%)', fontSize: "28px", position:"absolute", top:"-40px", left:"0", cursor:"pointer"}}/>
+                              <iframe
+                                width="840"
+                                height="467.5"
+                                src={movieTrailerUrl}
+                                title="Movie Trailer"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              />
+                              </Grid>
+                            )}
                       </Grid>
                     </Box>
                   );

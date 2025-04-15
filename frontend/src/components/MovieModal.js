@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useContext  } from 'react';
-import { Box, Button, CircularProgress, Dialog, DialogActions,Snackbar, DialogContent, DialogTitle, Grid,Alert, IconButton, List, ListItem, Modal, Typography } from '@mui/material';
+import { Box, Button, CircularProgress,Snackbar, Grid,Alert, IconButton, List, ListItem, Modal, Typography, useTheme, useMediaQuery } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
 import axios from 'axios';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { addFavoriteService, addToWatchlistService, removeFavoriteService, removeFromWatchlistService, fetchFavoritesService,fetchWatchlistService } from "../services/AuthService";
 const apiKey = '404bc2a47139c3a5d826814f03794b21'; // TMDB API key
 
@@ -33,6 +34,8 @@ const MovieModal = ({ selectedMovie, onOpen, onClose  }) => {
   const [loadingWatchlist, setLoadingWatchlist] = useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
   const topScrollRef = useRef(null); // Create a ref for the top scroll div
+  const [movieTrailerUrl, setMovieTrailerUrl] = useState("");
+  const [showTrailer, setShowTrailer] = useState(false);
 
   const handleSnackbarClose = (event, reason) => {
       if (reason === 'clickaway') {
@@ -51,7 +54,6 @@ const MovieModal = ({ selectedMovie, onOpen, onClose  }) => {
       setLoadingReviews(true);
       setMovieDetails(null);
       setReviews([]);
-
       fetchMovieInfo(selectedMovie);
       fetchSimilarMovies(selectedMovie);
       setIsModalOpen(true);
@@ -230,6 +232,39 @@ const fetchMovieInfo = async (movie) => {
   }
 };
 
+const fetchMovieTrailer = async (movie) => {
+  setLoadingInfo(true)
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${movie.id}/videos?language=en-US`,
+      {
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0MDRiYzJhNDcxMzljM2E1ZDgyNjgxNGYwMzc5NGIyMSIsIm5iZiI6MTcyNjYxMzg3MC43NTcwODIsInN1YiI6IjY1NGEwN2JjMjg2NmZhMDBjNDI1OWJmNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7jP0jl8WExn2tVvRBfkna_WrlXoGYbYCZDKcAwVoRbA'
+        }
+      }
+    );
+
+    const videos = response.data.results;
+
+    const trailer = videos.find(
+      (vid) => vid.type === "Trailer" && vid.site === "YouTube"
+    );
+
+    if (trailer) {
+      setMovieTrailerUrl(`https://www.youtube.com/embed/${trailer.key}`);
+    } else {
+      setMovieTrailerUrl(null);
+    }
+  } catch (error) {
+    console.error("Error fetching movie trailer:", error);
+    setMovieTrailerUrl(null);
+  } finally {
+    setLoadingInfo(false)
+  }
+};
+
+
 const handleAddToFavorites = async () => {
   const email = localStorage.getItem("email");
 
@@ -343,75 +378,99 @@ const handleAddToWatchlist = async () => {
                         {movieDetails.title} ({movieDetails.release_date?.split('-')[0]})
                       </Typography>
                     </Grid>
-                    <Grid mb={{xs:"0px", md:"20px"}} item xs={11.5} md={6} textAlign={"center"} sx={{ background: {xs:'linear-gradient(to right, #ff923c12, #ff923c42)', md:'linear-gradient(to right, transparent, #ff923c12)'}}}>
-                      <Box height={{xs:"490px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'}>
-                        <Box
-                          component="img"
-                          src={`https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`}
-                          alt={movieDetails.title}
-                          sx={{ width: {xs:"100%", md:"85%", lg:"80%", xl:"70%"}, position: 'relative', alignSelf:"center" }}
-                        />
-                      </Box>
-                    </Grid>
-                      <Grid mb={{xs:"15px", md:"20px"}} item xs={11.5} md={6} pr={{xs:"10px", md:"20px"}} paddingBlock={{xs:"10px", md:"unset"}} paddingLeft={{xs:"10px", md:"0px"}} sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)'}}>
-                      <Typography variant="body2" mt={2}>
-                        {movieDetails.overview}
-                      </Typography>
-                      <Typography variant="body1" mt={2}>
-                        <strong>Score:</strong> {Math.round(movieDetails.vote_average * 10) / 10}/10
-                      </Typography>
-                      <Typography variant="body1" mt={1}>
-                        <strong>Runtime:</strong> {movieDetails.runtime || 'Unknown'} minutes
-                      </Typography>
-                      <Typography variant="body1" mt={1}>
-                        <strong>Genres:</strong> {movieDetails.genres?.map(genre => genre.name).join(', ')}
-                      </Typography>
-                      <Typography variant="body1" mt={1}>
-                        <strong>Release Date:</strong> {movieDetails.release_date}
-                      </Typography>
-                      <Typography variant="body1" mt={1}>
-                        <strong>Original Language:</strong> {movieDetails.original_language?.toUpperCase()}
-                      </Typography>
-                      <Typography variant="body1" mt={1}>
-                        <strong>Budget:</strong> {movieDetails.budget ? `$${movieDetails.budget.toLocaleString()}` : 'Unknown'}
-                      </Typography>
-                      <Typography variant="body1" mt={1}>
-                        <strong>Revenue:</strong> {movieDetails.revenue ? `$${movieDetails.revenue.toLocaleString()}` : 'Unknown'}
-                      </Typography>
-                      <Typography variant="body1" mt={1}>
-                        <strong>Production Companies:</strong> {movieDetails.production_companies?.map(company => company.name).join(', ')}
-                      </Typography>
-                      <Typography variant="body1" mt={1}>
-                        <strong>Tagline:</strong> {movieDetails.tagline || 'Unknown'}
-                      </Typography>
-                      <Grid container mt={3} gap={1}>
-                      <Button onClick={handleAddToFavorites} disabled={loadingFavorites}>
-                          {loadingFavorites ? (
-                              <CircularProgress size={24} /> // Loading indicator
-                          ) : isFavorite ? (
-                              <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
-                          ) : (
-                              <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
-                          )}
-                      </Button>
-                      <Button onClick={handleAddToWatchlist} disabled={loadingWatchlist}>
-                          {loadingWatchlist ? (
-                              <CircularProgress size={24} /> // Loading indicator
-                          ) : isInWatchlist ? (
-                              <WatchLaterIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
-                          ) : (
-                              <WatchLaterOutlinedIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
-                          )}
-                      </Button>
-
-                        <div>
-                  {/* <Button onClick={handleAddToListClick}>
-                      Add to a List
-                  </Button> */}
-
-                      </div>
+                    {!showTrailer ? (
+                      <>
+                      <Grid mb={{xs:"0px", md:"20px"}} item xs={11.5} md={6} textAlign={"center"} sx={{ background: {xs:'linear-gradient(to right, #ff923c12, #ff923c42)', md:'linear-gradient(to right, transparent, #ff923c12)'}}}>
+                        <Box height={{xs:"490px", md:"100%"}} overflow="hidden" display={"flex"} justifyContent={'center'}>
+                          <Box
+                            component="img"
+                            src={`https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`}
+                            alt={movieDetails.title}
+                            sx={{ width: {xs:"100%", md:"85%", lg:"80%", xl:"70%"}, position: 'relative', alignSelf:"center" }}
+                          />
+                        </Box>
                       </Grid>
-                    </Grid>
+                        <Grid mb={{xs:"15px", md:"20px"}} item xs={11.5} md={6} pr={{xs:"10px", md:"20px"}} paddingBlock={{xs:"10px", md:"unset"}} paddingLeft={{xs:"10px", md:"0px"}} sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)'}}>
+                        <Typography variant="body2" mt={2}>
+                          {movieDetails.overview}
+                        </Typography>
+                        <Typography variant="body1" mt={2}>
+                          <strong>Score:</strong> {Math.round(movieDetails.vote_average * 10) / 10}/10
+                        </Typography>
+                        <Typography variant="body1" mt={1}>
+                          <strong>Runtime:</strong> {movieDetails.runtime || 'Unknown'} minutes
+                        </Typography>
+                        <Typography variant="body1" mt={1}>
+                          <strong>Genres:</strong> {movieDetails.genres?.map(genre => genre.name).join(', ')}
+                        </Typography>
+                        <Typography variant="body1" mt={1}>
+                          <strong>Release Date:</strong> {movieDetails.release_date}
+                        </Typography>
+                        <Typography variant="body1" mt={1}>
+                          <strong>Original Language:</strong> {movieDetails.original_language?.toUpperCase()}
+                        </Typography>
+                        <Typography variant="body1" mt={1}>
+                          <strong>Budget:</strong> {movieDetails.budget ? `$${movieDetails.budget.toLocaleString()}` : 'Unknown'}
+                        </Typography>
+                        <Typography variant="body1" mt={1}>
+                          <strong>Revenue:</strong> {movieDetails.revenue ? `$${movieDetails.revenue.toLocaleString()}` : 'Unknown'}
+                        </Typography>
+                        <Typography variant="body1" mt={1}>
+                          <strong>Production Companies:</strong> {movieDetails.production_companies?.map(company => company.name).join(', ')}
+                        </Typography>
+                        <Typography variant="body1" mt={1} mb={2}>
+                          <strong>Tagline:</strong> {movieDetails.tagline || 'Unknown'}
+                        </Typography>
+                        <Button variant="contained"  onClick={() => {
+                          fetchMovieTrailer(selectedMovie);
+                          setShowTrailer(true);
+                        }}>
+                          <Typography variant="body1">
+                            Watch Trailer
+                          </Typography>
+                        </Button>
+                        <Grid container mt={3} gap={1}>
+                        <Button onClick={handleAddToFavorites} disabled={loadingFavorites}>
+                            {loadingFavorites ? (
+                                <CircularProgress size={24} /> // Loading indicator
+                            ) : isFavorite ? (
+                                <FavoriteIcon style={{ color: 'red', fontSize: "36px" }} />
+                            ) : (
+                                <FavoriteBorderOutlinedIcon style={{ color: 'red', fontSize: "36px" }} />
+                            )}
+                        </Button>
+                        <Button onClick={handleAddToWatchlist} disabled={loadingWatchlist}>
+                            {loadingWatchlist ? (
+                                <CircularProgress size={24} /> // Loading indicator
+                            ) : isInWatchlist ? (
+                                <WatchLaterIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                            ) : (
+                                <WatchLaterOutlinedIcon style={{ color: '#ff7b2e', fontSize: "36px" }} />
+                            )}
+                        </Button>
+
+                          <div>
+                    {/* <Button onClick={handleAddToListClick}>
+                        Add to a List
+                    </Button> */}
+
+                        </div>
+                        </Grid>
+                      </Grid>
+                      </>
+                    ) : showTrailer && (
+                      <Grid position={"relative"} width={"100%"} display={"flex"} justifyContent={"center"} mb={5}>
+                      <ArrowBackIcon onClick={() => setShowTrailer(false)} style={{ color: 'rgb(0 0 0 / 60%)', fontSize: "28px", position:"absolute", top:"-40px", left:"0", cursor:"pointer"}}/>
+                      <iframe
+                        width="840"
+                        height="467.5"
+                        src={movieTrailerUrl}
+                        title="Movie Trailer"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                      </Grid>
+                    )}
                     {/* Reviews section */}
                     <Grid container justifyContent="center" xs={12}>
                       {/* Similar Movies section */}
