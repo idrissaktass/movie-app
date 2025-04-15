@@ -1361,9 +1361,9 @@ const handleAddToWatchlist = async (movieId) => {
                   const details = moviesDetails?.find(detail => detail.id === movie.id);
                   console.log("details",moviesDetails)
                   return (
-                    <Box key={movie.id} sx={{ mb: 3 }}>
+                    <Box key={movie.id} sx={{ mb: 3 }} px={{xs:2, sm:3.5}}>
                       <Typography variant="h6" display={showTrailerId !== movie.id ? "unset" : "none"}>{movie.title}</Typography>
-                      <Grid position="relative"
+                      <Grid
                         mb={{ xs: "15px", md: "20px" }} 
                         item 
                         xs={11.5} 
@@ -1377,7 +1377,7 @@ const handleAddToWatchlist = async (movieId) => {
                         sx={{ background: 'linear-gradient(to right, #ff923c12, #ff923c42)' }}>
                           {showTrailerId !== movie.id ? (
                             <>
-                              <Grid display={'flex'} justifyContent={'center'}>
+                              <Grid display={'flex'} justifyContent={'center'}  position="relative">
                                 <Box position="relative"
                                 height={{xs:"50%", sm:"600px", md:"100%"}}
                                 width={{xs:"100%", sm:"70%", md:"250px"}} 
