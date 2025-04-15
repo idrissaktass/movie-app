@@ -62,7 +62,7 @@ const Footer = () => {
                     fontWeight={"400"} 
                     color="white"
                 >
-                    © {new Date().getFullYear()} CineScope - Tüm Hakları Saklıdır.
+                    © {new Date().getFullYear()} CineScope - All rights reserved.
                 </Typography>
             </Grid>
         </>

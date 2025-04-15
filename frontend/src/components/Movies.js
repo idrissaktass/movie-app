@@ -897,22 +897,22 @@ const handleAddToWatchlist = async (movieId) => {
                             {movie.overview}
                           </Typography>
                           <Typography variant="body1" mt={2}>
-                            <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'N/A'}/10
+                            <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'Unknown'}/10
                           </Typography>
                           <Typography variant="body1" mt={1}>
                             <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'N/A'}
+                            <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'Unknown'}
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Release Date:</strong> {details?.release_date || 'N/A'}
+                            <strong>Release Date:</strong> {details?.release_date || 'Unknown'}
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'N/A'}
+                            <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'Unknown'}
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Tagline:</strong> {details?.tagline || 'N/A'}
+                            <strong>Tagline:</strong> {details?.tagline || 'Unknown'}
                           </Typography>
                           <Grid container mt={1} gap={1} mb={1}>
                           <Button onClick={() => handleAddToFavorites(movie.id)}disabled={loadingFavorites}>
@@ -1011,16 +1011,16 @@ const handleAddToWatchlist = async (movieId) => {
                   <strong>Original Language:</strong> {movieDetails.original_language?.toUpperCase()}
                 </Typography>
                 <Typography variant="body1" mt={1}>
-                  <strong>Budget:</strong> {movieDetails.budget ? `$${movieDetails.budget.toLocaleString()}` : 'N/A'}
+                  <strong>Budget:</strong> {movieDetails.budget ? `$${movieDetails.budget.toLocaleString()}` : 'Unknown'}
                 </Typography>
                 <Typography variant="body1" mt={1}>
-                  <strong>Revenue:</strong> {movieDetails.revenue ? `$${movieDetails.revenue.toLocaleString()}` : 'N/A'}
+                  <strong>Revenue:</strong> {movieDetails.revenue ? `$${movieDetails.revenue.toLocaleString()}` : 'Unknown'}
                 </Typography>
                 <Typography variant="body1" mt={1}>
                   <strong>Production Companies:</strong> {movieDetails.production_companies?.map(company => company.name).join(', ')}
                 </Typography>
                 <Typography variant="body1" mt={1}>
-                  <strong>Tagline:</strong> {movieDetails.tagline || 'N/A'}
+                  <strong>Tagline:</strong> {movieDetails.tagline || 'Unknown'}
                 </Typography>
                 <Grid container mt={3} gap={1}>
                 <Button onClick={() => handleAddToFavorites(selectedMovie.id)} disabled={loadingFavorites}>
@@ -1264,22 +1264,22 @@ const handleAddToWatchlist = async (movieId) => {
                             {movie.overview}
                           </Typography>
                           <Typography variant="body1" mt={2}>
-                            <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'N/A'}/10
+                            <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'Unknown'}/10
                           </Typography>
                           <Typography variant="body1" mt={1}>
                             <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'N/A'}
+                            <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'Unknown'}
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Release Date:</strong> {details?.release_date || 'N/A'}
+                            <strong>Release Date:</strong> {details?.release_date || 'Unknown'}
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'N/A'}
+                            <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'Unknown'}
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Tagline:</strong> {details?.tagline || 'N/A'}
+                            <strong>Tagline:</strong> {details?.tagline || 'Unknown'}
                           </Typography>
                           <Grid container  mt={1} gap={1} mb={1}>
                             <Button onClick={() => {

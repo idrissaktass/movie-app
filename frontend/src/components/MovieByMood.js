@@ -100,22 +100,22 @@ const MovieByMood = (selectedMovie, onOpen  ) => {
                               {movie.overview}
                             </Typography>
                             <Typography variant="body1" mt={2}>
-                              <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'N/A'}/10
+                              <strong>Score:</strong> {details ? (Math.round(details.vote_average * 10) / 10) : 'Unknown'}/10
                             </Typography>
                             <Typography variant="body1" mt={1}>
                               <strong>Runtime:</strong> {details?.runtime || 'Unknown'} minutes
                             </Typography>
                             <Typography variant="body1" mt={1}>
-                              <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'N/A'}
+                              <strong>Genres:</strong> {details?.genres?.map(genre => genre.name).join(', ') || 'Unknown'}
                             </Typography>
                             <Typography variant="body1" mt={1}>
-                              <strong>Release Date:</strong> {details?.release_date || 'N/A'}
+                              <strong>Release Date:</strong> {details?.release_date || 'Unknown'}
                             </Typography>
                             <Typography variant="body1" mt={1}>
-                              <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'N/A'}
+                              <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'Unknown'}
                             </Typography>
                             <Typography variant="body1" mt={1}>
-                              <strong>Tagline:</strong> {details?.tagline || 'N/A'}
+                              <strong>Tagline:</strong> {details?.tagline || 'Unknown'}
                             </Typography>
                             <Grid container mt={1} gap={1} mb={1}>
                               <Button onClick={handleAddToFavorites}>

@@ -373,16 +373,16 @@ const handleAddToWatchlist = async () => {
                         <strong>Original Language:</strong> {movieDetails.original_language?.toUpperCase()}
                       </Typography>
                       <Typography variant="body1" mt={1}>
-                        <strong>Budget:</strong> {movieDetails.budget ? `$${movieDetails.budget.toLocaleString()}` : 'N/A'}
+                        <strong>Budget:</strong> {movieDetails.budget ? `$${movieDetails.budget.toLocaleString()}` : 'Unknown'}
                       </Typography>
                       <Typography variant="body1" mt={1}>
-                        <strong>Revenue:</strong> {movieDetails.revenue ? `$${movieDetails.revenue.toLocaleString()}` : 'N/A'}
+                        <strong>Revenue:</strong> {movieDetails.revenue ? `$${movieDetails.revenue.toLocaleString()}` : 'Unknown'}
                       </Typography>
                       <Typography variant="body1" mt={1}>
                         <strong>Production Companies:</strong> {movieDetails.production_companies?.map(company => company.name).join(', ')}
                       </Typography>
                       <Typography variant="body1" mt={1}>
-                        <strong>Tagline:</strong> {movieDetails.tagline || 'N/A'}
+                        <strong>Tagline:</strong> {movieDetails.tagline || 'Unknown'}
                       </Typography>
                       <Grid container mt={3} gap={1}>
                       <Button onClick={handleAddToFavorites} disabled={loadingFavorites}>
