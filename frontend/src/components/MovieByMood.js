@@ -55,10 +55,10 @@ const MovieByMood = (selectedMovie, onOpen  ) => {
             control={<Checkbox onChange={handleMoodChange} value="tense" />}
             label="Tense"
           />
-          <FormControlLabel
+          {/* <FormControlLabel
             control={<Checkbox onChange={handleMoodChange} value="curious" />}
             label="Curious"
-          />
+          /> */}
           <FormControlLabel
             control={<Checkbox onChange={handleMoodChange} value="rebellious" />}
             label="Rebellious"
