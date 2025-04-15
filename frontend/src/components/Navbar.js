@@ -22,6 +22,7 @@ import axios from "axios";
 import { useNavigate, useLocation  } from "react-router-dom";
 import { fetchWatchlistService, fetchFavoritesService } from "../services/AuthService";
 import { useTheme } from "@mui/material/styles";
+import "./Navbar.css"
 
 // Style for the search bar
 const Search = styled("div")(({ theme }) => ({
@@ -215,6 +216,26 @@ const Navbar = () => {
           </Typography>
         </Grid>
         <Box sx={{ display: { xs: "none", md: "flex" }, ml: 2 }}>
+          <Button 
+            onClick={() => window.open("https://buymeacoffee.com/aidiary", "_blank")}
+            sx={{
+                mr:"10px",
+                padding: '5px 10px 5px 10px',
+                backgroundColor: '#ffdd00',
+                border: 'none',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: '#ffdd00',
+                  boxShadow:"0px 2px 5px black"
+                },
+                
+            }}>
+                <img src="/coffee-icon.png" width={"25px"} height={"auto"}/>
+                <Typography className="coffee" sx={{ color: 'black', fontFamily: "'Cookie', cursive", textTransform:"lowercase" ,fontWeight: "450", fontSize:{xs:"18px", lg:"22px"} }}>
+                buy me a coffee
+                </Typography>
+          </Button>
           <Button sx={{ color: getButtonColor("/") }} onClick={handleHome}>
             <Typography>Home</Typography>
           </Button>
@@ -252,6 +273,24 @@ const Navbar = () => {
         {/* Hamburger Menu for Mobile */}
           {isSmallScreen && (
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+              <Button 
+                onClick={() => window.open("https://buymeacoffee.com/aidiary", "_blank")}
+                sx={{
+                    padding: '5px 10px 5px 10px',
+                    backgroundColor: '#ffdd00',
+                    border: 'none',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: '#ffee33',
+                      boxShadow:"0px 2px 5px black"
+                    },
+                }}>
+                    <img src="/coffee-icon.png" width={"25px"} height={"auto"}/>
+                    <Typography className="coffee" display={{xs:"none", sm:"unset"}} sx={{ color: 'black', fontFamily: "'Cookie', cursive", textTransform:"lowercase" ,fontWeight: "450", fontSize:{xs:"18px", lg:"22px"} }}>
+                    buy me a coffee
+                    </Typography>
+              </Button>
               <IconButton
                 edge="end"
                 color="inherit"
