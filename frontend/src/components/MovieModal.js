@@ -258,9 +258,9 @@ const handleAddToFavorites = async () => {
         setSnackbarOpen(true); // Open snackbar
     }
   } else {
-    setSnackbarMessage('User not logged in or no movie selected.'); // Use Snackbar instead of alert
+    setSnackbarMessage('User not logged in'); // Use Snackbar instead of alert
     setSnackbarOpen(true); // Open snackbar
-
+    setSnackbarSeverity('error');
   }
 };
 
@@ -292,9 +292,9 @@ const handleAddToWatchlist = async () => {
           setSnackbarOpen(true); // Open snackbar
       }
   } else {
-    setSnackbarMessage('User not logged in or no movie selected.'); // Use Snackbar instead of alert
+    setSnackbarMessage('User not logged in'); // Use Snackbar instead of alert
     setSnackbarOpen(true); // Open snackbar
-
+    setSnackbarSeverity('error');
   }
 };
 
@@ -460,7 +460,7 @@ const handleAddToWatchlist = async () => {
                                     {review.content?.length > 300 && (
                                     <span
                                       variant="body2"
-                                      sx={{ cursor: 'pointer', mt: 1 }}
+                                      style={{ cursor: 'pointer', mt: 1, color:"#006effe6" }}
                                       onClick={handleToggle}
                                     >
                                       {isExpanded ? ' Read Less' : ' Read More'}

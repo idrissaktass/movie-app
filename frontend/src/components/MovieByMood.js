@@ -115,15 +115,6 @@ const MovieByMood = (selectedMovie, onOpen  ) => {
                               <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'N/A'}
                             </Typography>
                             <Typography variant="body1" mt={1}>
-                              <strong>Budget:</strong> {details?.budget ? `$${details.budget.toLocaleString()}` : 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Revenue:</strong> {details?.revenue ? `$${details.revenue.toLocaleString()}` : 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
-                              <strong>Production Companies:</strong> {details?.production_companies?.map(company => company.name).join(', ') || 'N/A'}
-                            </Typography>
-                            <Typography variant="body1" mt={1}>
                               <strong>Tagline:</strong> {details?.tagline || 'N/A'}
                             </Typography>
                             <Grid container mt={1} gap={1} mb={1}>

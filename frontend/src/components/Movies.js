@@ -56,7 +56,7 @@ const moodsGenresMapping = {
   humorous: [35, 10402], // Comedy, Music
   uplifting: [35, 12, 10751], // Comedy, Adventure, Family
   tense: [53, 9648], // Thriller, Mystery
-  curious: [878, 99], // Sci-Fi, Documentary
+  // curious: [878, 99], // Sci-Fi, Documentary
   rebellious: [28, 80], // Action, Crime
 };
 
@@ -209,7 +209,7 @@ const handleAddToWatchlist = async (movieId) => {
           setSnackbarOpen(true); // Open snackbar
       }
   } else {
-      setSnackbarMessage('User not logged in or no movie selected.');
+      setSnackbarMessage('User not logged in');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
   }
@@ -584,7 +584,7 @@ const handleAddToWatchlist = async (movieId) => {
     { value: 'humorous', label: 'Humorous' },
     { value: 'uplifting', label: 'Uplifting' },
     { value: 'tense', label: 'Tense' },
-    { value: 'curious', label: 'Curious' },
+    // { value: 'curious', label: 'Curious' },
     { value: 'rebellious', label: 'Rebellious' },
   ];
 
@@ -912,15 +912,6 @@ const handleAddToWatchlist = async (movieId) => {
                             <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'N/A'}
                           </Typography>
                           <Typography variant="body1" mt={1}>
-                            <strong>Budget:</strong> {details?.budget ? `$${details.budget.toLocaleString()}` : 'N/A'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Revenue:</strong> {details?.revenue ? `$${details.revenue.toLocaleString()}` : 'N/A'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Production Companies:</strong> {details?.production_companies?.map(company => company.name).join(', ') || 'N/A'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
                             <strong>Tagline:</strong> {details?.tagline || 'N/A'}
                           </Typography>
                           <Grid container mt={1} gap={1} mb={1}>
@@ -1108,7 +1099,7 @@ const handleAddToWatchlist = async (movieId) => {
                               {review.content?.length > 300 && (
                               <span
                                 variant="body2"
-                                sx={{ cursor: 'pointer', mt: 1 }}
+                                style={{ cursor: 'pointer', mt: 1 , color:"#006effe6"}}
                                 onClick={handleToggle}
                               >
                                 {isExpanded ? ' Read Less' : ' Read More'}
@@ -1286,15 +1277,6 @@ const handleAddToWatchlist = async (movieId) => {
                           </Typography>
                           <Typography variant="body1" mt={1}>
                             <strong>Original Language:</strong> {details?.original_language?.toUpperCase() || 'N/A'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Budget:</strong> {details?.budget ? `$${details.budget.toLocaleString()}` : 'N/A'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Revenue:</strong> {details?.revenue ? `$${details.revenue.toLocaleString()}` : 'N/A'}
-                          </Typography>
-                          <Typography variant="body1" mt={1}>
-                            <strong>Production Companies:</strong> {details?.production_companies?.map(company => company.name).join(', ') || 'N/A'}
                           </Typography>
                           <Typography variant="body1" mt={1}>
                             <strong>Tagline:</strong> {details?.tagline || 'N/A'}
