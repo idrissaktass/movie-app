@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { TextField, Button, Snackbar, Grid, Typography, Box, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { loginService } from "../services/AuthService";
+import Navbar from "./Navbar";
 
 const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
@@ -33,74 +34,77 @@ const Login = ({ setIsAuthenticated }) => {
   };
 
   return (
-    <Grid container justifyContent="center" alignItems="center" sx={{ minHeight: "100vh" }}>
-      <Grid item xs={11} sm={8} md={6} lg={5} xl={4}>
-        <Box
-          sx={{
-            backgroundColor: "white",
-            padding: "2rem",
-            borderRadius: "8px",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-            position: "relative", 
-          }}
-        >
-          {loading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                zIndex: 1,
-              }}
-            />
-          )}
-          <Typography variant="h5" gutterBottom>
-            Login
+    <Grid sx={{ minHeight: "100vh" }}>
+      <Navbar/>
+      <Grid container justifyContent="center" alignItems="center" pt={15}>
+        <Grid item xs={11} sm={8} md={6} lg={5} xl={4}>
+          <Box
+            sx={{
+              backgroundColor: "white",
+              padding: "2rem",
+              borderRadius: "8px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+              position: "relative", 
+            }}
+          >
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 1,
+                }}
+              />
+            )}
+            <Typography variant="h5" gutterBottom>
+              Login
+            </Typography>
+            <form onSubmit={handleLogin}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    variant="outlined"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type="password"
+                    variant="outlined"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+                    {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          </Box>
+          <Snackbar
+            open={openSnackbar}
+            onClose={() => setOpenSnackbar(false)}
+            message={snackbarMessage}
+            autoHideDuration={4000}
+          />
+          <Typography mt={1} textAlign={"end"}>
+            Don't you have an account? <span onClick={() => navigate("/signup")} style={{ cursor: "pointer", color: "#1976d2" }}>Sign Up.</span>
           </Typography>
-          <form onSubmit={handleLogin}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  variant="outlined"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Password"
-                  type="password"
-                  variant="outlined"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-                  {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Box>
-        <Snackbar
-          open={openSnackbar}
-          onClose={() => setOpenSnackbar(false)}
-          message={snackbarMessage}
-          autoHideDuration={4000}
-        />
-        <Typography mt={1} textAlign={"end"}>
-          Don't you have an account? <span onClick={() => navigate("/signup")} style={{ cursor: "pointer", color: "#1976d2" }}>Sign Up.</span>
-        </Typography>
+        </Grid>
       </Grid>
     </Grid>
   );

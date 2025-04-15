@@ -9,6 +9,7 @@ import { Grid } from '@mui/material';
 import SearchResults from './components/SearchResults';
 import FilmQuiz from './components/FilmQuiz';
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import Footer from './components/Footer';
 
 const theme = createTheme({ 
   breakpoints: {
@@ -47,6 +48,7 @@ function App() {
                 {/* Add protected routes based on authentication */}
                 {/* Example: <Route path="/protected" element={isAuthenticated ? <ProtectedComponent /> : <Navigate to="/login" />} /> */}
               </Routes>
+              <Footer/>
             </HelmetProvider>
           </Router>
         </AuthProvider>

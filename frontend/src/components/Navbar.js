@@ -10,7 +10,8 @@ import {
   MenuItem,
   Button,
   CircularProgress,
-  Grid,useMediaQuery
+  Grid,useMediaQuery,
+  Snackbar, Alert
 } from "@mui/material";
 import { Menu as MenuIcon, Search as SearchIcon } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
@@ -75,7 +76,10 @@ const Navbar = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("md"));
   const location = useLocation();
-
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("error"); 
+  
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -94,10 +98,13 @@ const Navbar = () => {
     handleMenuClose();
     window.location.reload();
   };
+
   const handleHome = () => {
     navigate("/");
     setAnchorEl(null);
+
   }
+
   const handleFavoritesOpen = async () => {
     if (!isAuthenticated) {
       alert("Please login first!");
@@ -116,13 +123,23 @@ const Navbar = () => {
     }
   };
 
+  const showSnackbar = (message, severity = "error") => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000);
+  };  
+
   const handleWatchlistOpen = async () => {
     if (!isAuthenticated) {
-      alert("Please login first!");
-      navigate("/login");
+      showSnackbar("Please login first!");
       setAnchorEl(null);
       return;
     }
+    
     try {
       const email = localStorage.getItem("email");
       const fetchedWatchlist = await fetchWatchlistService(email);
@@ -172,45 +189,46 @@ const Navbar = () => {
 
   const handleQuiz = () => {
     if (!isAuthenticated) {
-      alert("Please login first!");
-      navigate("/login");
+      showSnackbar("Please login first!");
       setAnchorEl(null);
       return;
     }
+    
     navigate("/quiz");
     setAnchorEl(null);
   };
   const getButtonColor = (path) => (location.pathname === path ? "black" : "inherit");
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#934c14" }}>
+    <AppBar position="static" sx={{background:"linear-gradient(to right,#201003,#934c14)"}}>
       <Toolbar>
         <Grid flexGrow={1}>
-          <Typography
-            variant="h6"
-            noWrap
-            width={"fit-content"}
-            sx={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
+          <Typography 
+              onClick={() => navigate("/")} 
+              fontSize={"20px"} 
+              fontWeight={"700"} 
+              color="#de7618" 
+              width={"fit-content"}
+              sx={{ cursor: "pointer" }}
           >
-            CineScope
+              CineScope
           </Typography>
         </Grid>
         <Box sx={{ display: { xs: "none", md: "flex" }, ml: 2 }}>
           <Button sx={{ color: getButtonColor("/") }} onClick={handleHome}>
-            Home
+            <Typography>Home</Typography>
           </Button>
           <Button sx={{ color: getButtonColor("/search-results") }} onClick={handleSearchOptions}>
-            Search Movies
+            <Typography>Search Movies</Typography>
           </Button>
           <Button sx={{ color: getButtonColor("/quiz") }} onClick={handleQuiz}>
-            Quiz
+            <Typography>Quiz</Typography>
           </Button>
           <Button sx={{ color: "inherit" }} onClick={handleWatchlistOpen}>
-            Watchlist
+            <Typography>Watchlist</Typography>
           </Button>
           <Button sx={{ color: "inherit" }} onClick={handleFavoritesOpen}>
-            Favorites
+            <Typography>Favorites</Typography>
           </Button>
         </Box>
 
@@ -226,7 +244,7 @@ const Navbar = () => {
             </>
           ) : (
             <Button color="inherit" onClick={() => navigate("/login")}>
-              Login
+              <Typography>Login</Typography>
             </Button>
           )}
         </Box>
@@ -257,6 +275,16 @@ const Navbar = () => {
               </Menu>
             </Box>
           )}
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={2000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          >
+            <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
 
         {/* Modals for Watchlist and Favorites */}
         {showWatchlist && <WatchlistModal onClose={() => setShowWatchlist(false)} watchlist={watchlist}/>}

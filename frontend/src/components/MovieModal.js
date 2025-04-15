@@ -336,7 +336,7 @@ const handleAddToWatchlist = async () => {
                     <CircularProgress size={60} /> {/* Adjust the size as needed */}
                   </Box>
                   ) : (
-                  <Grid container paddingInline={{xs:"10px", lg:"40px"}} paddingBlock={{xs:"20px", lg:"40px"}} justifyContent={'center'}>
+                  <Grid container paddingInline={{xs:"10px", lg:"40px"}} paddingBlock={{xs:"10px", lg:"10px"}} justifyContent={'center'}>
                     {/* Movie details section */}
                     <Grid xs={12} textAlign={"center"} mb={2}>
                       <Typography variant="h5" component="h2">

@@ -118,27 +118,43 @@ const SearchResults = ({ onClose, SearchResults  }) => {
   };
 
   const handleYearClick = async (year) => {
-    setYearIsClicked(true);
-    setSelectedYear(year);
-    fetchMovies(selectedGenres, year); // Fetch movies based on selected year
+    const isSameYear = selectedYear === year;
+  
+    if (isSameYear) {
+      setSelectedYear(null); // Yıl seçimini kaldır
+      setYearIsClicked(false); 
+      fetchMovies(selectedGenres, null); // Yılsız filtrele
+    } else {
+      setYearIsClicked(true);
+      setSelectedYear(year);
+      fetchMovies(selectedGenres, year); // Yeni yıl ile filtrele
+    }
   };
+  
 
   const fetchMovies = async (genres, year, page = 1) => {
     setLoading(true)
     try {
+      const params = {
+        with_genres: genres.join(','),
+        vote_count: 100,
+        sort_by: 'popularity.desc',
+        page,
+      };
+  
+      // Eğer kullanıcı yıl seçtiyse gönder
+      if (year) {
+        params.primary_release_year = year;
+      }
+  
       const response = await axios.get(`https://api.themoviedb.org/3/discover/movie`, {
-        params: {
-          with_genres: genres.join(','), // Convert array to comma-separated string
-          primary_release_year: year,
-          vote_count: 100,
-          sort_by: 'popularity.desc',
-          page,
-        },
+        params,
         headers: {
           accept: 'application/json',
           Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0MDRiYzJhNDcxMzljM2E1ZDgyNjgxNGYwMzc5NGIyMSIsIm5iZiI6MTcyNjYxMzg3MC43NTcwODIsInN1YiI6IjY1NGEwN2JjMjg2NmZhMDBjNDI1OWJmNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.7jP0jl8WExn2tVvRBfkna_WrlXoGYbYCZDKcAwVoRbA'
         },
       });
+  
       setMovies(response.data.results);
       setTotalPages(response.data.total_pages);
     } catch (error) {
@@ -226,6 +242,11 @@ const SearchResults = ({ onClose, SearchResults  }) => {
           </Grid>
         </Grid>
         {loading && <CircularProgress sx={{ mt: 2 }} />}
+        {!loading && selectedGenres.length === 0 && !selectedYear && (
+          <Typography variant="h6" align="center" mt={4} color="textSecondary">
+            Please select at least one genre or a release year to see movie results.
+          </Typography>
+        )}
         {(selectedGenres.length > 0 || selectedYear) && !loading && (
           <Grid xs={12}>    
             <Grid item xs={12} mt={2}>
