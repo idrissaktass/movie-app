@@ -20,6 +20,7 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import WatchLaterOutlinedIcon from '@mui/icons-material/WatchLaterOutlined';
 import { Helmet } from "react-helmet-async";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MouseIcon from '@mui/icons-material/Mouse';
 
 const genresList = [
   { id: 28, name: 'Action' },
@@ -647,6 +648,12 @@ const handleAddToWatchlist = async (movieId) => {
               Dive into the world of cinema! Discover top-rated movies, get suggestions, and find the perfect film to match your mood. Explore, enjoy, and get lost in the magic of movies.
             </Typography>
           </div>
+          <Typography display={"flex"} color={"#ffffff96"} alignItems={"center"} sx={{cursor:"pointer", zIndex:"999"}} onClick={() => {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+          }}>
+            Scroll to get suggestion
+            <MouseIcon style={{ color: '#934c14', fontSize: "28px" }}/>
+          </Typography>
         </Grid>
 
         {/* Random Movie Carousel */}
