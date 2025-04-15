@@ -8,6 +8,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Grid } from '@mui/material';
 import SearchResults from './components/SearchResults';
 import FilmQuiz from './components/FilmQuiz';
+import { Helmet, HelmetProvider } from "react-helmet-async";
 
 const theme = createTheme({ 
   breakpoints: {
@@ -29,15 +30,24 @@ function App() {
       <ThemeProvider theme={theme}>
         <AuthProvider>
           <Router>
-            <Routes>
-              <Route path="/" element={<Movies />} />
-              <Route path="/quiz" element={<FilmQuiz />} />
-              <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/search-results" element={<SearchResults/>} />
-              {/* Add protected routes based on authentication */}
-              {/* Example: <Route path="/protected" element={isAuthenticated ? <ProtectedComponent /> : <Navigate to="/login" />} /> */}
-            </Routes>
+            <HelmetProvider>
+              <Helmet>
+                <title>Diary AI - Personal Journal and Mood Analysis</title>
+                <meta name="google-site-verification" content="qWuFVhUHkiJjBTNgbKDHhSduS6BoA8ZDMTkXO2N6wYg" />
+                <meta name="google-site-verification" content="qWuFVhUHkiJjBTNgbKDHhSduS6BoA8ZDMTkXO2N6wYg" />
+                <meta name="description" content="Find your movie with suggestions" />
+                <meta name="keywords" content="Movie Quiz, Film Quiz, Movie Trivia, Film Knowledge Test, Movie Games, movie, movies, film, films, movie suggestion, film suggestion, movie by mood" />
+              </Helmet>
+              <Routes>
+                <Route path="/" element={<Movies />} />
+                <Route path="/quiz" element={<FilmQuiz />} />
+                <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/search-results" element={<SearchResults/>} />
+                {/* Add protected routes based on authentication */}
+                {/* Example: <Route path="/protected" element={isAuthenticated ? <ProtectedComponent /> : <Navigate to="/login" />} /> */}
+              </Routes>
+            </HelmetProvider>
           </Router>
         </AuthProvider>
       </ThemeProvider>
