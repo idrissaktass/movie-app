@@ -4,9 +4,9 @@ import Navbar from "./Navbar";
 
 const PrivacyPolicy = () => {
   return (
-    <Grid>
+    <Grid minHeight={"100vh"}>
       <Navbar />
-      <Paper sx={{ padding: 3, marginBottom: 3, maxWidth: 900 }}>
+      <Paper sx={{ padding: 3, marginBottom: 3, maxWidth: 900, justifySelf:"center", marginTop:"30px" }}>
         <Typography variant="h4" gutterBottom>
           Privacy Policy
         </Typography>
