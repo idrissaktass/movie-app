@@ -1,7 +1,6 @@
 import React from "react";
-import { Typography, Container, Box, Paper } from "@mui/material";
+import { Typography, Container, Box, Paper, Grid } from "@mui/material";
 import Navbar from "./Navbar";
-import { Grid } from "@mui/system";
 
 const PrivacyPolicy = () => {
   return (
