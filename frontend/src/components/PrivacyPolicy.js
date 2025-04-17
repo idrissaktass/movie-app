@@ -49,7 +49,7 @@ const PrivacyPolicy = () => {
           any time. You can manage your preferences and account settings through
           the app’s profile section.
         </Typography>
-
+        <span id="ezoic-privacy-policy-embed"></span>
       </Paper>
     </Grid>
   );
