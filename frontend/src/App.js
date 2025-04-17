@@ -10,6 +10,7 @@ import SearchResults from './components/SearchResults';
 import FilmQuiz from './components/FilmQuiz';
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Footer from './components/Footer';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 const theme = createTheme({ 
   breakpoints: {
@@ -42,6 +43,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Movies />} />
                 <Route path="/quiz" element={<FilmQuiz />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/search-results" element={<SearchResults/>} />
